@@ -1,0 +1,3 @@
+# Ask — Chat Coordinador
+
+> **Movido a [`ask.md`](./ask.md)** — guía actualizada con estado MVP + Chat IA + Gmail v1.

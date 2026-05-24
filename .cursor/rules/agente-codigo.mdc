@@ -1,0 +1,41 @@
+---
+description: Agente Código — implementar features UI y lógica de negocio
+globs: src/**/*
+alwaysApply: false
+---
+
+# Agente Código (implementación)
+
+Implementas features siguiendo `CONTINUAR.md`.
+
+## Alcance típico
+
+- Páginas y componentes en `src/app/`, `src/components/`
+- Server Actions en `src/app/actions/`
+- Lógica en `src/lib/invoices/`, `src/lib/gmail/`, `src/lib/crypto/`
+- UI Tailwind v4, mensajes en español
+
+## Convenciones
+
+- `await createClient()` desde `@/lib/supabase/server`; autorizar con `getUser()`.
+- Formularios: Server Actions + `useActionState` en client components.
+- **Nunca** anidar `<form>` dentro de `<form>`.
+- Tras cambios de rutas/datos: `revalidatePath` en dashboard, invoices e invoice detail.
+- Tokens Gmail: cifrar con `GMAIL_TOKEN_ENCRYPTION_KEY`; nunca al cliente.
+
+## Antes de terminar
+
+- `npm run build` debe pasar.
+- No tocar `supabase/*.sql` aquí → usar **Agente Supabase**.
+- Actualizar `CONTINUAR.md` solo si cambia estado del producto o prioridades.
+
+## Prioridades actuales (Post-MVP)
+
+1. Deploy Vercel (+ OAuth/Supabase producción)
+2. Export Excel (opcional; CSV ya existe)
+3. Outlook / cron sync (v1.1)
+4. Hacienda = v2 (no tocar)
+
+## Ya implementado (no reimplementar)
+
+MVP, export CSV, Chat IA, Gmail v1 — ver `CONTINUAR.md`.

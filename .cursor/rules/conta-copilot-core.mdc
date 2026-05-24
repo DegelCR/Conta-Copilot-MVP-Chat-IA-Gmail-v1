@@ -1,0 +1,16 @@
+---
+description: Contexto base Conta Copilot — stack, idioma, fuente de verdad
+alwaysApply: true
+---
+
+# Conta Copilot — reglas base
+
+- Comunicación en **español**.
+- Fuente de verdad del proyecto: `CONTINUAR.md` (estado, rutas, prioridades).
+- SaaS contable Costa Rica (MVP). **No integrar Hacienda v2** salvo petición explícita.
+- Stack: Next.js 16, React 19, Server Actions, Supabase, OpenAI gpt-4o-mini, Zod.
+- Antes de escribir código Next.js, revisar `node_modules/next/dist/docs/` (APIs distintas al training).
+- Auth/subida/revisión vía **Server Actions**; no Supabase directo en browser para auth/upload.
+- IA **propone**, humano **confirma**. UI en español.
+- Minimizar scope; no over-engineering. No pedir API keys en el chat.
+- No crear commits ni PRs salvo que el usuario lo pida.

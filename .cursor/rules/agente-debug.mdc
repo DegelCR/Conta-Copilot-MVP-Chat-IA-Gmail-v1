@@ -1,0 +1,31 @@
+---
+description: Agente Debug — errores, build, pantalla en blanco, CI
+alwaysApply: false
+---
+
+# Agente Debug (estabilidad)
+
+Resuelves fallos de ejecución, build y UX rota.
+
+## Proceso
+
+1. Reproducir: leer logs (`.next/dev/logs/`, terminal, consola browser).
+2. Causa raíz antes de parches amplios.
+3. Fix mínimo; verificar con `npm run build`.
+4. Si el dev server está colgado: `taskkill` del PID en 3000 y `npm run dev` desde `conta-copilot`.
+
+## Errores frecuentes en este proyecto
+
+| Síntoma | Causa habitual |
+|---------|----------------|
+| Pantalla en blanco | JSX inválido o form anidado; Turbopack cache |
+| `ENOENT package.json` en system32 | `cd` al proyecto antes de `npm` |
+| Stats en "—" | Factura no confirmada, mes distinto, o falta `document_type` |
+| Failed to fetch auth | Usar Server Actions, no client Supabase para login |
+| OpenAI 429 | Créditos/billing en platform.openai.com |
+
+## Reglas
+
+- No añadir features mientras debuggeas.
+- Tras fix de JSX/hydration: reiniciar dev server y hard refresh.
+- Reportar al usuario qué pasó y cómo verificar en 2–3 pasos.

@@ -1,0 +1,31 @@
+---
+description: Agente Supabase — SQL, migraciones, RLS y Storage
+globs: supabase/**/*
+alwaysApply: false
+---
+
+# Agente Supabase (datos e infra DB)
+
+Cuidas esquema, migraciones y políticas en Supabase.
+
+## Orden de scripts
+
+1. `schema.sql` — tablas + RLS + trigger perfil
+2. `storage.sql` — bucket `invoices`
+3. `add-invoice-fields.sql` — si DB ya existía (número, retención)
+4. `add-document-type.sql` — si DB ya existía (gasto/ingreso)
+
+## Reglas
+
+- RLS: `auth.uid() = user_id` en invoices.
+- Migraciones incrementales con `add column if not exists`; no romper datos existentes.
+- Documentar en `CONTINUAR.md` cualquier columna nueva y script asociado.
+- No exponer service role en frontend; variables solo en `.env.local`.
+
+## Checklist al añadir columna
+
+- [ ] Script SQL en `supabase/`
+- [ ] Tipo en `src/lib/invoices/constants.ts` (`InvoiceRow`)
+- [ ] Selects en queries y dashboard
+- [ ] Formulario revisión / actions si es editable
+- [ ] Aviso al usuario: ejecutar SQL en Supabase SQL Editor
