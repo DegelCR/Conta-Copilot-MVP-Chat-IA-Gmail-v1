@@ -65,6 +65,8 @@ Vercel muestra **3 pestañas**: **Production**, **Preview**, **Development**.
 
 **Páginas legales:** `/privacidad` y `/terminos` (enlaces en footer de la app).
 
+**Avisos fiscales (UI):** franja en dashboard, aviso en chat, texto al confirmar factura, landing y footer — textos en `src/lib/legal/disclaimer.ts` (commit `5664b40`). Beta básica; revisión por abogado opcional antes de escalar.
+
 ### ⚠️ Nombre correcto de la clave anon
 
 | ❌ Incorrecto | ✅ Correcto |

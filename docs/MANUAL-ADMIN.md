@@ -19,6 +19,7 @@ Documentación técnica extra: [`DEPLOY-VERCEL.md`](../DEPLOY-VERCEL.md) · [`CO
 | 5 | Correo del piloto en Test users | Google Cloud |
 | 6 | Enviar link + manual de usuario | WhatsApp / correo |
 | 7 | Sesión 20–30 min de onboarding | Llamada o presencial |
+| 8 | Avisos legales visibles en la app | Franja dashboard, chat, confirmar factura, footer |
 
 ---
 
@@ -109,9 +110,10 @@ Sin esto, Gmail dirá “access blocked” o similar.
 Adaptá el tono (usted/vos). Incluí:
 
 - Link de la app.
-- Beta, sin Hacienda.
+- Beta, sin Hacienda, **no es asesoría fiscal** (organiza facturas; el contador valida).
 - IA opcional; él/ella revisa todo.
 - Ofrecé 20–30 min para conectar Gmail.
+- Enlaces legales: `/terminos` y `/privacidad`.
 
 ---
 
@@ -120,8 +122,8 @@ Adaptá el tono (usted/vos). Incluí:
 ### A. Cuenta (5 min)
 
 1. Piloto abre el link en celular o PC.
-2. **Crear cuenta** con su correo (o login si ya la creaste en Supabase).
-3. Entra al **Dashboard**.
+2. **Crear cuenta** con su correo (o login si ya la creaste en Supabase); acepta términos en el registro.
+3. Entra al **Dashboard** — mostrá la **franja amarilla** de aviso legal (normal en beta).
 
 ### B. Menú móvil (2 min si es celular)
 
@@ -160,7 +162,7 @@ Preguntas para anotar:
 
 | Hacé | Evitá |
 |------|--------|
-| Responder dudas en WhatsApp | Prometer Hacienda o XML oficial |
+| Responder dudas en WhatsApp | Prometer Hacienda, XML oficial o “asesoría fiscal” del producto |
 | Agregar Test users si cambia de correo Gmail | Que procesen 200+ facturas con IA el día 1 |
 | Revisar uso OpenAI (platform.openai.com → Usage) | Compartir tu `.env.local` o claves |
 | Pedir feedback a la semana 2 | Cambiar `GMAIL_TOKEN_ENCRYPTION_KEY` en Vercel sin avisar |
@@ -230,8 +232,28 @@ Esperá deploy **Ready** antes de decirle al piloto que “ya está arreglado”
 | Google Cloud | https://console.cloud.google.com/ |
 | OpenAI usage | https://platform.openai.com/usage |
 | Manual usuario (compartir) | `docs/MANUAL-USUARIO.md` |
+| Términos de uso | https://conta-copilot-mvp-chat-ia-gmail-v1.vercel.app/terminos |
+| Privacidad | https://conta-copilot-mvp-chat-ia-gmail-v1.vercel.app/privacidad |
 | Factura prueba HTML | https://conta-copilot-mvp-chat-ia-gmail-v1.vercel.app/test-invoices/factura-prueba-gmail.html |
 
 ---
 
-*Última actualización: mayo 2026 — commit `a4ec2e0` (Excel, menú móvil, ampliar PDF).*
+## 12. Aviso legal en la app (beta básica)
+
+Textos centralizados en código: `src/lib/legal/disclaimer.ts` · componente `FiscalDisclaimer`.
+
+| Dónde | Qué ve el usuario |
+|-------|-------------------|
+| Dashboard (layout) | Franja ámbar arriba |
+| Chat | Aviso dentro del panel |
+| Confirmar factura | Línea antes de los botones |
+| Landing + footer | Texto compacto |
+| Términos (`/terminos`) | Naturaleza del servicio ampliada |
+
+**Revisión profesional (opcional):** un abogado puede revisar términos y textos antes de escalar comercialmente; para el piloto esto deja claro que es herramienta de organización, no despacho virtual.
+
+Variable opcional en Vercel: `NEXT_PUBLIC_CONTACT_EMAIL` (correo en páginas legales).
+
+---
+
+*Última actualización: mayo 2026 — commits `da70b09` (privacidad/términos), `5664b40` (avisos fiscales en UI).*

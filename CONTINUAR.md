@@ -61,7 +61,9 @@ Chat IA (/dashboard/chat) — preguntas sobre facturas confirmadas
 - [x] **Confirmar** / **Rechazar** factura (redirect al dashboard)
 - [x] Dashboard: **Gastos (mes)** e **IVA estimado** desde facturas **confirmadas**
 - [x] **Tabla de facturas** `/dashboard/invoices` con filtros y búsqueda
-- [x] **Export CSV** y **Excel (.xlsx)** en `/dashboard/invoices` — columnas autoajustadas en Excel; CSV con `;` para Excel CR *(en repo local; pendiente push si no está en GitHub)*
+- [x] **Export CSV** y **Excel (.xlsx)** en `/dashboard/invoices` — columnas autoajustadas en Excel; CSV con `;` para Excel CR
+- [x] **Páginas legales** `/privacidad`, `/terminos` + footer; aceptación en registro (`da70b09`)
+- [x] **Avisos «no es asesoría fiscal»** en UI (dashboard, chat, confirmar factura, landing) + términos ampliados (`5664b40`)
 - [x] **Ingresos (mes)** y tipo gasto/ingreso (`document_type`)
 - [x] Editar facturas **confirmadas** y reprocesar con IA
 - [x] Campos **número de factura** y **retención** (IA + formulario revisión)
@@ -75,7 +77,7 @@ Chat IA (/dashboard/chat) — preguntas sobre facturas confirmadas
 **Producción Vercel:** https://conta-copilot-mvp-chat-ia-gmail-v1.vercel.app  
 **Diagnóstico:** `/api/debug/env` → `anonLooksValid: true`
 
-**GitHub:** https://github.com/DegelCR/Conta-Copilot-MVP-Chat-IA-Gmail-v1 (rama `master`, último fix deploy `db9df67`)
+**GitHub:** https://github.com/DegelCR/Conta-Copilot-MVP-Chat-IA-Gmail-v1 (rama `master`, último `5664b40` — avisos fiscales; antes `da70b09` legal)
 
 **Deploy:** ✅ Producción operativa — ver [`DEPLOY-VERCEL.md`](./DEPLOY-VERCEL.md)
 
@@ -101,7 +103,8 @@ Chat IA (/dashboard/chat) — preguntas sobre facturas confirmadas
 | 0 | **GitHub** | Tú | ✅ |
 | 1 | **Deploy Vercel** + login prod | Tú | ✅ |
 | 2 | **Gmail en producción** | Tú | ✅ Probado (sync + IA en factura de prueba) |
-| 3 | **Export Excel** | Código | ✅ Local (`exceljs`); push a GitHub si falta |
+| 3 | **Export Excel** | Código | ✅ en prod |
+| 3b | **Legal / avisos fiscales** | Código | ✅ UI + términos; revisión abogada opcional |
 | 4 | **Piloto 1 cliente** | Tú | ⏳ — `docs/MANUAL-USUARIO.md` + `docs/MANUAL-ADMIN.md` |
 | 5 | Outlook / sync cron (v1.1) | ⏳ Futuro |
 | 6 | Reenvío correo → buzón de la app (inbound email) | ⏳ Futuro — hoy es Gmail OAuth |
@@ -151,7 +154,7 @@ Resumen post-deploy:
 | Límite sugerido | ~30–50 facturas con IA el primer mes (proteger crédito OpenAI) |
 | Precio beta orientativo | Gratis 1.er mes a cambio de feedback, o **USD 10–18/mes** (₡5 000–9 000) |
 
-**Mensaje clave al cliente:** beta, sin Hacienda, IA opcional, empezar con un negocio.
+**Mensaje clave al cliente:** beta, sin Hacienda, **no es asesoría fiscal** (organiza y estima; usted/confirma con su contador), IA opcional, empezar con un negocio.
 
 ---
 

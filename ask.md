@@ -13,7 +13,9 @@ Ruta: `C:\Users\Fran\Desktop\conta-copilot` · Fuente de verdad: [`CONTINUAR.md`
 |------|--------|
 | MVP + Chat + Gmail | ✅ |
 | **Producción Vercel** | ✅ login, Gmail, IA probados |
-| **Export Excel** | ✅ en código local (pendiente push) |
+| **Export Excel** | ✅ en prod |
+| **Privacidad / Términos** | ✅ `/privacidad`, `/terminos`, footer |
+| **Avisos «no es asesoría fiscal»** | ✅ dashboard, chat, confirmar, landing (`5664b40`) |
 | **Piloto 1 cliente** | ⏳ Manuales en `docs/MANUAL-USUARIO.md` y `docs/MANUAL-ADMIN.md` |
 | Hacienda CR | ❌ Fase 3 |
 
@@ -35,8 +37,8 @@ Ruta: `C:\Users\Fran\Desktop\conta-copilot` · Fuente de verdad: [`CONTINUAR.md`
 | # | Tarea |
 |---|--------|
 | 1 | Piloto comercial acotado |
-| 2 | Push Excel + docs si falta en GitHub |
-| 3 | Excel estable en prod / límites IA por plan |
+| 2 | Revisión legal opcional (abogada) sobre términos |
+| 3 | Límites IA por plan / pulido pro |
 | 4 | Inbound email, Outlook, Hacienda |
 
 ---
@@ -65,4 +67,4 @@ Estado: MVP + v1 ✅ en prod. Pausa desarrollo. Siguiente: piloto 1 cliente (alc
 
 ---
 
-*Pausa mayo 2026 — prod verificado; piloto pendiente.*
+*Pausa mayo 2026 — prod verificado; avisos legales en UI; piloto pendiente.*

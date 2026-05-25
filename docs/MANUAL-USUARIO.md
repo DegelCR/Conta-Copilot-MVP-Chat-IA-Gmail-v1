@@ -15,9 +15,16 @@ Guía simple para quien usa la aplicación en el piloto.
 
 ## ¿Qué NO hace? (importante)
 
-- **No** envía nada a Hacienda.
+- **No** es asesoría fiscal, legal ni contable; **no** reemplaza a su contador o abogado.
+- **No** envía nada al Ministerio de Hacienda.
 - **No** reemplaza su criterio contable: usted **confirma** cada factura.
 - **No** procesa miles de facturas solas: la IA va **factura por factura** si la usa.
+
+### Avisos en la app
+
+Verá mensajes en **franja amarilla** (arriba en el dashboard), en el **chat**, al **confirmar** una factura y al pie de la página. Son recordatorios de que la herramienta **organiza facturas** y muestra **estimaciones**; usted debe validar los datos.
+
+Más detalle legal: [Términos de uso](https://conta-copilot-mvp-chat-ia-gmail-v1.vercel.app/terminos) · [Política de privacidad](https://conta-copilot-mvp-chat-ia-gmail-v1.vercel.app/privacidad) (enlaces también en el pie de la app).
 
 ---
 
@@ -77,6 +84,8 @@ En computadora el menú aparece arriba sin el botón ☰.
 
 ### Confirmar o rechazar
 
+Antes de confirmar verá un recordatorio: la app **no es asesoría fiscal**.
+
 - **Confirmar factura** → entra al resumen del mes y al Excel.
 - **Rechazar** → no suma en totales (factura descartada).
 
@@ -113,8 +122,9 @@ Puede marcar la factura como **Gasto** o **Ingreso** antes de confirmar.
 ## 7. Chat (opcional)
 
 1. Menú → **Chat**.
-2. Haga preguntas sobre facturas **ya confirmadas** (ej. “¿Cuánto gasté este mes?”).
-3. Las respuestas usan solo sus datos confirmados.
+2. Lea el aviso arriba del cuadro de chat (no es asesoría fiscal).
+3. Haga preguntas sobre facturas **ya confirmadas** (ej. “¿Cuánto gasté este mes?”).
+4. Las respuestas usan solo sus datos confirmados; para **qué declarar ante Hacienda** consulte a su contador.
 
 ---
 
@@ -153,4 +163,4 @@ Contacte a quien le dio el acceso (Francisco / administrador del piloto) con:
 
 ---
 
-*Conta Copilot — beta. Sin vínculo con Hacienda. Mayo 2026.*
+*Conta Copilot — beta. No es asesoría fiscal ni legal. Sin vínculo con Hacienda. Mayo 2026.*

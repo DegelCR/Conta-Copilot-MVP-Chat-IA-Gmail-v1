@@ -10,18 +10,19 @@
 |------|--------|
 | Producción | ✅ https://conta-copilot-mvp-chat-ia-gmail-v1.vercel.app |
 | Login + Gmail + IA en prod | ✅ verificado por el usuario |
-| Export Excel | ✅ código local; verificar push a `master` |
+| Export Excel | ✅ en prod |
+| Legal / avisos fiscales | ✅ `da70b09`, `5664b40` |
 | Piloto comercial | ⏳ siguiente paso humano |
 | Hacienda | ❌ fase 3 |
 
-**Git:** `master` · deploy `db9df67` · cambios locales sin commit (docs, Excel, test-invoices)
+**Git:** `master` · último `5664b40`
 
 ---
 
 ## Piloto (resumen)
 
 - 1 negocio, mes actual, 2–4 semanas.
-- Valor: ordenar correo + Excel; Hacienda no.
+- Valor: ordenar correo + Excel; Hacienda no; no es asesoría fiscal (avisos en UI).
 - IA opcional; demo sin IA = solo sync + revisión.
 - Contacto con muchas facturas: acotar o solo importar sin IA masiva.
 
@@ -37,7 +38,7 @@
 ## Al retomar
 
 1. Ofrecer piloto / feedback.
-2. `git status` → push Excel + markdown + `public/test-invoices/`.
+2. Ofrecer piloto; opcional: revisión legal de términos con abogada.
 3. Código futuro: límites IA, IA en lote, inbound email (reenvío).
 
 ---

@@ -122,6 +122,8 @@ conta-copilot/
 | `/dashboard/invoices/[id]` | Revisar / confirmar factura |
 | `/dashboard/chat` | Chat IA sobre facturas confirmadas |
 | `/dashboard/gmail` | Conectar / sincronizar Gmail |
+| `/privacidad` | Política de privacidad |
+| `/terminos` | Términos de uso |
 
 ---
 
@@ -139,10 +141,12 @@ conta-copilot/
 ### Post-MVP v1 ✅
 - [x] Chat IA (`/dashboard/chat`)
 - [x] Gmail v1 (`/dashboard/gmail`) — **conectado y verificado**
+- [x] Export Excel + menú móvil
+- [x] Privacidad, términos y avisos «no es asesoría fiscal» en UI
 
 ### Siguiente
-- [ ] Deploy Vercel (prioridad)
-- [ ] Export Excel (opcional)
+- [ ] Piloto comercial acotado (1 negocio, mes actual)
+- [ ] Revisión legal opcional (términos / textos)
 - [ ] Hacienda CR (fase 3)
 
 ---
@@ -165,7 +169,9 @@ Detalle completo: [`CONTINUAR.md`](./CONTINUAR.md) → sección *Facturación Co
 
 Guía: [`DEPLOY-VERCEL.md`](./DEPLOY-VERCEL.md) · Piloto y límites: [`CONTINUAR.md`](./CONTINUAR.md)
 
-**Export:** Excel (principal) + CSV en `/dashboard/invoices` (cambio local; confirmar en GitHub).
+**Export:** Excel (principal) + CSV en `/dashboard/invoices`.
+
+**Legal:** avisos visibles en dashboard, chat y al confirmar facturas; textos en `src/lib/legal/disclaimer.ts`. No sustituye asesoría fiscal ni vínculo con Hacienda.
 
 **Estado:** pausa desarrollo mayo 2026; siguiente paso = piloto comercial acotado.
 
