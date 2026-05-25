@@ -2,6 +2,8 @@ import Link from "next/link";
 import { ChatPanel } from "@/components/chat-panel";
 import { DashboardHeader } from "@/components/dashboard-header";
 
+export const dynamic = "force-dynamic";
+
 export default function ChatPage() {
   return (
     <div className="min-h-full bg-zinc-50">

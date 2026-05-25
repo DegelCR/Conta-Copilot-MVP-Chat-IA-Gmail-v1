@@ -8,67 +8,80 @@ Ruta local: `C:\Users\Fran\Desktop\conta-copilot`
 
 ## Antes de empezar
 
-- [ ] `npm run build` pasa en local
-- [ ] Tienes cuenta en [GitHub](https://github.com) y [Vercel](https://vercel.com)
-- [ ] Supabase project: `gufhkxexvqxhnmubmhuq`
-- [ ] Google Cloud OAuth configurado (Gmail)
+- [x] `npm run build` pasa en local
+- [x] Código en GitHub
+- [ ] Proyecto importado en Vercel + env vars + redeploy
+- [ ] Supabase Site URL y Google OAuth con URL de producción
+- [x] Supabase project: `gufhkxexvqxhnmubmhuq`
+- [x] Google Cloud OAuth configurado (Gmail local)
 
 ---
 
-## Paso 1 — Subir código a GitHub
+## Repositorio GitHub ✅
 
-El repo **no tiene remote** todavía. En PowerShell:
+| Campo | Valor |
+|-------|--------|
+| **URL** | https://github.com/DegelCR/Conta-Copilot-MVP-Chat-IA-Gmail-v1 |
+| **Rama** | `master` |
+| **Último commit** | `c2370e8` — *Conta Copilot MVP + Chat IA + Gmail v1* |
+| **Remote local** | `origin` → mismo repo |
+
+**No está en GitHub:** `.env.local` (secretos — correcto).
+
+---
+
+## Paso 1 — GitHub ✅ (hecho)
 
 ```powershell
 cd C:\Users\Fran\Desktop\conta-copilot
-git add .
-git commit -m "Conta Copilot MVP + Chat IA + Gmail v1"
+git remote -v
+# origin → https://github.com/DegelCR/Conta-Copilot-MVP-Chat-IA-Gmail-v1.git
 ```
 
-Crea repo en GitHub (web: **New repository**, sin README) y luego:
+Para futuros cambios:
 
 ```powershell
-git remote add origin https://github.com/TU_USUARIO/conta-copilot.git
-git push -u origin master
+git add .
+git commit -m "Descripción del cambio"
+git push origin master
 ```
-
-*(Si tu rama se llama `main`, usa `main` en lugar de `master`.)*
-
-**No subas** `.env.local` — ya está en `.gitignore`.
 
 ---
 
 ## Paso 2 — Importar en Vercel
 
 1. [vercel.com](https://vercel.com) → **Add New** → **Project**
-2. Importa el repo `conta-copilot`
+2. Importa **`DegelCR/Conta-Copilot-MVP-Chat-IA-Gmail-v1`**
 3. Framework: **Next.js** (auto-detectado)
-4. **Deploy** (primera vez puede fallar sin env vars — normal)
+4. **Antes del deploy que quieras que pase:** añade variables del **Paso 3** (mínimo Supabase + OpenAI). Si el primer deploy falla en build, es normal — completa Paso 3 y **Redeploy**.
 
-Anota tu URL, ej: `https://conta-copilot.vercel.app`
+Anota tu URL, ej: `https://conta-copilot-mvp-chat-ia-gmail-v1.vercel.app`
 
 ---
 
-## Paso 3 — Variables de entorno en Vercel
+## Paso 3 — Variables de entorno en Vercel (obligatorio para el build)
 
-**Settings → Environment Variables** → añade todas (Production + Preview):
+**Settings → Environment Variables** → marca **Production** y **Preview** en cada una:
 
 | Variable | Valor |
 |----------|--------|
 | `NEXT_PUBLIC_SUPABASE_URL` | `https://gufhkxexvqxhnmubmhuq.supabase.co` |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | *(copiar de `.env.local`)* |
 | `OPENAI_API_KEY` | *(copiar de `.env.local`)* |
-| `NEXT_PUBLIC_APP_URL` | `https://TU-DOMINIO.vercel.app` |
+| `NEXT_PUBLIC_APP_URL` | `https://TU-DOMINIO.vercel.app` *(tu URL real de Vercel)* |
 | `GOOGLE_CLIENT_ID` | *(copiar de `.env.local`)* |
 | `GOOGLE_CLIENT_SECRET` | *(copiar de `.env.local`)* |
 | `GOOGLE_REDIRECT_URI` | `https://TU-DOMINIO.vercel.app/api/gmail/callback` |
-| `GMAIL_TOKEN_ENCRYPTION_KEY` | *(misma clave que en local — no cambiar si ya conectaste Gmail en dev)* |
+| `GMAIL_TOKEN_ENCRYPTION_KEY` | *(misma clave que en local)* |
 
-**Importante:** `GOOGLE_REDIRECT_URI` debe ser la URL **de producción**, no `localhost`.
+**Crítico:** Sin `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_ANON_KEY` el build falla con:
 
-`SUPABASE_SERVICE_ROLE_KEY` — opcional en Vercel (solo se usa en scripts locales).
+```text
+Error: @supabase/ssr: Your project's URL and API key are required...
+prerendering page "/dashboard/chat"
+```
 
-Tras guardar → **Redeploy** (Deployments → ⋮ → Redeploy).
+Tras guardar → **Deployments** → último deploy → **⋮** → **Redeploy** (no basta con guardar vars; hay que redeployar).
 
 ---
 
@@ -115,6 +128,7 @@ Comparte la URL con tu amigo/familiar. Cada uno necesita **su propia cuenta** (s
 
 | Síntoma | Causa | Fix |
 |---------|--------|-----|
+| Build falla en `/dashboard/chat` — Supabase URL and API key required | Faltan env vars en Vercel (o no redeployaste) | Paso 3: `NEXT_PUBLIC_SUPABASE_*` + **Redeploy** |
 | Login no funciona | Site URL Supabase incorrecta | Paso 4 |
 | Gmail redirect error | URI distinta en Google vs Vercel | Pasos 3 y 5 deben coincidir exacto |
 | Access blocked Google | Usuario no en Test users | OAuth consent screen |
@@ -149,4 +163,4 @@ vercel --prod
 
 ---
 
-*Última actualización: mayo 2026 — Post-MVP v1 listo para deploy.*
+*Última actualización: mayo 2026 — GitHub ✅ · Siguiente: importar en Vercel.*
