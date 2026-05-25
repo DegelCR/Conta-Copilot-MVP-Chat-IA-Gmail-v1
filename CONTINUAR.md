@@ -102,7 +102,7 @@ Chat IA (/dashboard/chat) — preguntas sobre facturas confirmadas
 | 1 | **Deploy Vercel** + login prod | Tú | ✅ |
 | 2 | **Gmail en producción** | Tú | ✅ Probado (sync + IA en factura de prueba) |
 | 3 | **Export Excel** | Código | ✅ Local (`exceljs`); push a GitHub si falta |
-| 4 | **Piloto 1 cliente** (contador / multi-negocio acotado) | Tú | ⏳ Por ofrecer |
+| 4 | **Piloto 1 cliente** | Tú | ⏳ — `docs/MANUAL-USUARIO.md` + `docs/MANUAL-ADMIN.md` |
 | 5 | Outlook / sync cron (v1.1) | ⏳ Futuro |
 | 6 | Reenvío correo → buzón de la app (inbound email) | ⏳ Futuro — hoy es Gmail OAuth |
 | 7 | Integración Hacienda CR | ❌ Fase 3 — no tocar |
@@ -133,6 +133,7 @@ Resumen post-deploy:
 3. Supabase Site URL + `/auth/callback` con dominio `*.vercel.app`.
 4. Google: `/api/gmail/callback` en prod.
 5. Facturas prueba: `public/test-invoices/` o URL `/test-invoices/factura-prueba-gmail.html`.
+6. Manuales piloto: [`docs/MANUAL-USUARIO.md`](./docs/MANUAL-USUARIO.md) · administrador: [`docs/MANUAL-ADMIN.md`](./docs/MANUAL-ADMIN.md).
 
 ---
 

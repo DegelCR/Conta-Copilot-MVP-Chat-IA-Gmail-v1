@@ -59,6 +59,8 @@ Estado: MVP + v1 ✅ en prod. Pausa desarrollo. Siguiente: piloto 1 cliente (alc
 |---------|-----|
 | `CONTINUAR.md` | Handoff completo + piloto + límites |
 | `DEPLOY-VERCEL.md` | Prod, env vars, errores |
+| `docs/MANUAL-USUARIO.md` | Compartir al piloto |
+| `docs/MANUAL-ADMIN.md` | Tu checklist activación |
 | `public/test-invoices/LEEME.md` | Factura prueba Gmail |
 
 ---

@@ -169,6 +169,8 @@ Guía: [`DEPLOY-VERCEL.md`](./DEPLOY-VERCEL.md) · Piloto y límites: [`CONTINUA
 
 **Estado:** pausa desarrollo mayo 2026; siguiente paso = piloto comercial acotado.
 
+**Manuales:** [`docs/MANUAL-USUARIO.md`](./docs/MANUAL-USUARIO.md) (compartir al piloto) · [`docs/MANUAL-ADMIN.md`](./docs/MANUAL-ADMIN.md) (activación y onboarding).
+
 ---
 
 ## Seguridad

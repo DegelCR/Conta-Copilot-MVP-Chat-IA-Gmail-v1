@@ -349,6 +349,8 @@ Tarea: [detalle]
 | `CONTINUAR.md` | Estado técnico y producto |
 | `AGENT_HANDOFF.md` | Resumen ultra corto |
 | `ask.md` | Guía chat coordinador |
+| `docs/MANUAL-USUARIO.md` | Manual para piloto / usuario final |
+| `docs/MANUAL-ADMIN.md` | Activación y soporte (vos) |
 | `.cursor/rules/*.mdc` | Reglas Cursor |
 
 ---
