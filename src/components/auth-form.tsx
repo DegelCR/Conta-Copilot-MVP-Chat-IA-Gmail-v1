@@ -1,12 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState } from "react";
-import {
-  signInAction,
-  signUpAction,
-  type AuthActionState,
-} from "@/app/actions/auth";
+import { useRouter } from "next/navigation";
+import { useState, type FormEvent } from "react";
+import { createClient } from "@/lib/supabase/client";
 
 type AuthMode = "login" | "signup";
 
@@ -14,12 +11,73 @@ type AuthFormProps = {
   mode: AuthMode;
 };
 
-const initialState: AuthActionState = {};
-
 export function AuthForm({ mode }: AuthFormProps) {
   const isLogin = mode === "login";
-  const action = isLogin ? signInAction : signUpAction;
-  const [state, formAction, pending] = useActionState(action, initialState);
+  const router = useRouter();
+  const supabase = createClient();
+  const [error, setError] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
+  const [pending, setPending] = useState(false);
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setPending(true);
+    setError(null);
+    setMessage(null);
+
+    const formData = new FormData(event.currentTarget);
+    const email = String(formData.get("email") ?? "").trim();
+    const password = String(formData.get("password") ?? "");
+
+    if (!email || !password) {
+      setError("Correo y contraseña son obligatorios.");
+      setPending(false);
+      return;
+    }
+
+    if (isLogin) {
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (signInError) {
+        setError(signInError.message);
+        setPending(false);
+        return;
+      }
+
+      router.push("/dashboard");
+      router.refresh();
+      return;
+    }
+
+    const origin = window.location.origin;
+    const { data, error: signUpError } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: `${origin}/auth/callback`,
+      },
+    });
+
+    if (signUpError) {
+      setError(signUpError.message);
+      setPending(false);
+      return;
+    }
+
+    if (data.session) {
+      router.push("/dashboard");
+      router.refresh();
+      return;
+    }
+
+    setMessage(
+      "Cuenta creada. Si Supabase pide confirmar el correo, revisa tu bandeja; si no, inicia sesión.",
+    );
+    setPending(false);
+  }
 
   return (
     <div className="w-full max-w-md rounded-2xl border border-zinc-200 bg-white p-8 shadow-sm">
@@ -32,7 +90,7 @@ export function AuthForm({ mode }: AuthFormProps) {
           : "Empieza a organizar tus facturas con IA."}
       </p>
 
-      <form action={formAction} className="mt-8 space-y-4">
+      <form onSubmit={handleSubmit} className="mt-8 space-y-4">
         <div>
           <label htmlFor="email" className="block text-sm font-medium text-zinc-700">
             Correo
@@ -61,12 +119,12 @@ export function AuthForm({ mode }: AuthFormProps) {
           />
         </div>
 
-        {state.error && (
-          <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{state.error}</p>
+        {error && (
+          <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>
         )}
-        {state.message && (
+        {message && (
           <p className="rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-800">
-            {state.message}
+            {message}
           </p>
         )}
 
@@ -95,14 +153,6 @@ export function AuthForm({ mode }: AuthFormProps) {
             </Link>
           </>
         )}
-      </p>
-
-      <p className="mt-4 text-center text-xs text-zinc-500">
-        Usa{" "}
-        <a href="http://localhost:3000" className="underline">
-          localhost:3000
-        </a>{" "}
-        (no la IP de red) si el navegador bloquea la conexión.
       </p>
     </div>
   );

@@ -129,7 +129,7 @@ Comparte la URL con tu amigo/familiar. Cada uno necesita **su propia cuenta** (s
 | Síntoma | Causa | Fix |
 |---------|--------|-----|
 | Build falla en `/dashboard/chat` — Supabase URL and API key required | Faltan env vars en Vercel (o no redeployaste) | Paso 3: `NEXT_PUBLIC_SUPABASE_*` + **Redeploy** |
-| Login no funciona | Site URL Supabase incorrecta | Paso 4 |
+| Login no funciona / página no carga tras entrar | Site URL o Redirect URLs en Supabase incorrectas; o bucle de cookies (redeploy con fix auth) | Paso 4 + último commit en GitHub |
 | Gmail redirect error | URI distinta en Google vs Vercel | Pasos 3 y 5 deben coincidir exacto |
 | Access blocked Google | Usuario no en Test users | OAuth consent screen |
 | Gmail tokens inválidos | Cambiaste `GMAIL_TOKEN_ENCRYPTION_KEY` | Usar la misma clave o desconectar/reconectar Gmail |

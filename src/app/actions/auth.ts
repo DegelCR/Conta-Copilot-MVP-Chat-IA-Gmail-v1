@@ -14,7 +14,7 @@ async function getOrigin() {
   const host = headerList.get("host");
   const protocol = headerList.get("x-forwarded-proto") ?? "http";
   if (host) return `${protocol}://${host}`;
-  return process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  return process.env.NEXT_PUBLIC_APP_URL?.trim() ?? "http://localhost:3000";
 }
 
 export async function signInAction(
