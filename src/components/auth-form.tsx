@@ -24,14 +24,25 @@ export function AuthForm({ mode }: AuthFormProps) {
     setError(null);
     setMessage(null);
 
-    const supabase = createClient();
-
     const formData = new FormData(event.currentTarget);
     const email = String(formData.get("email") ?? "").trim();
     const password = String(formData.get("password") ?? "");
 
     if (!email || !password) {
       setError("Correo y contraseña son obligatorios.");
+      setPending(false);
+      return;
+    }
+
+    let supabase;
+    try {
+      supabase = createClient();
+    } catch (configError) {
+      setError(
+        configError instanceof Error
+          ? configError.message
+          : "Supabase no está configurado en el servidor.",
+      );
       setPending(false);
       return;
     }
