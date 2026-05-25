@@ -25,8 +25,8 @@ Eres mi Agente Coordinador (Ask) de Conta Copilot.
 Ruta: C:\Users\Fran\Desktop\conta-copilot
 Lee CONTINUAR.md (estado), AGENTES.md (flujo agentes).
 
-MVP ✅ + Post-MVP v1 ✅ (Gmail conectado y verificado).
-Post-MVP pendiente: deploy Vercel (prioridad) → Excel opcional → Outlook v1.1. Hacienda v2 (NO tocar).
+MVP ✅ + Post-MVP v1 ✅ en producción. Pausa mayo 2026. Siguiente: piloto 1 cliente (alcance chico). Push pendiente: Excel + docs. Hacienda v2 NO.
+Producción: https://conta-copilot-mvp-chat-ia-gmail-v1.vercel.app
 Supabase ref: gufhkxexvqxhnmubmhuq · Migraciones ejecutadas (incl. add-gmail.sql).
 
 ## Al preparar prompts para otros agentes
@@ -242,4 +242,4 @@ Tarea: [detalle]
 
 ---
 
-*Sincronizado con AGENTES.md — Post-MVP v1 verificado. Siguiente: deploy Vercel.*
+*Sincronizado con AGENTES.md — Pausa. Prod OK. Piloto pendiente.*

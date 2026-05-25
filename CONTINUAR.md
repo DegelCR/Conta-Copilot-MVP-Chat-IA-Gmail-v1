@@ -22,7 +22,7 @@ SaaS contable con IA para Costa Rica: **subir → IA extrae → usuario revisa y
 | Backend | Server Actions (`src/app/actions/`) |
 | Auth + DB + Storage | Supabase (`@supabase/ssr`) |
 | IA | OpenAI **gpt-4o-mini** + Zod structured output (`openai`, `zod`) |
-| Deploy previsto | Vercel |
+| Deploy | **Vercel** | ✅ Producción — ver abajo |
 
 **Dependencias clave:** `next`, `@supabase/ssr`, `openai`, `zod`, `googleapis`
 
@@ -52,7 +52,7 @@ Chat IA (/dashboard/chat) — preguntas sobre facturas confirmadas
 
 ## Lo que YA funciona (verificado por el usuario)
 
-- [x] Login / registro (Server Actions — evita "Failed to fetch")
+- [x] Login / registro — local y **producción Vercel** (formulario cliente + Supabase browser; ver commits `4b1df54`, `db9df67`)
 - [x] Dashboard protegido `/dashboard`
 - [x] Supabase: `schema.sql`, `storage.sql`, RLS, bucket `invoices`
 - [x] Subida de facturas + lista **Facturas recientes**
@@ -61,18 +61,25 @@ Chat IA (/dashboard/chat) — preguntas sobre facturas confirmadas
 - [x] **Confirmar** / **Rechazar** factura (redirect al dashboard)
 - [x] Dashboard: **Gastos (mes)** e **IVA estimado** desde facturas **confirmadas**
 - [x] **Tabla de facturas** `/dashboard/invoices` con filtros y búsqueda
-- [x] **Export CSV** en `/dashboard/invoices` (respeta filtros actuales)
+- [x] **Export CSV** y **Excel (.xlsx)** en `/dashboard/invoices` — columnas autoajustadas en Excel; CSV con `;` para Excel CR *(en repo local; pendiente push si no está en GitHub)*
 - [x] **Ingresos (mes)** y tipo gasto/ingreso (`document_type`)
 - [x] Editar facturas **confirmadas** y reprocesar con IA
 - [x] Campos **número de factura** y **retención** (IA + formulario revisión)
 - [x] Validación montos: `subtotal + IVA − retención ≈ total`
 - [x] OpenAI con créditos activos (~$5 depósito de prueba)
 - [x] **Chat IA** `/dashboard/chat` — preguntas sobre facturas confirmadas (sin historial en DB)
-- [x] **Gmail v1** `/dashboard/gmail` — OAuth, sync adjuntos, `source=gmail`, dedup `gmail_imports` **(conexión verificada por el usuario — mayo 2026)**
+- [x] **Gmail v1** — OAuth, sync adjuntos **verificado en local y producción** (mayo 2026)
 
-**Usuario de prueba:** `franciscotest@gmail.com` (no compartir contraseña en chat).
+**Usuario de prueba (prod):** `frtest@gmail.com` — no documentar contraseña en el repo.
 
-**Supabase project ref:** `gufhkxexvqxhnmubmhuq`
+**Producción Vercel:** https://conta-copilot-mvp-chat-ia-gmail-v1.vercel.app  
+**Diagnóstico:** `/api/debug/env` → `anonLooksValid: true`
+
+**GitHub:** https://github.com/DegelCR/Conta-Copilot-MVP-Chat-IA-Gmail-v1 (rama `master`, último fix deploy `db9df67`)
+
+**Deploy:** ✅ Producción operativa — ver [`DEPLOY-VERCEL.md`](./DEPLOY-VERCEL.md)
+
+**Pausa (mayo 2026):** desarrollo detenido tras deploy + pruebas prod OK. Siguiente paso humano: **ofrecer piloto** a contacto contable (1 negocio, mes actual). Ver sección **Piloto beta** abajo.
 
 ---
 
@@ -91,10 +98,14 @@ Chat IA (/dashboard/chat) — preguntas sobre facturas confirmadas
 
 | # | Tarea | Estado |
 |---|--------|--------|
-| 1 | **Deploy Vercel** | Tú | ⏳ En curso — [`DEPLOY-VERCEL.md`](./DEPLOY-VERCEL.md) |
-| 2 | **Export Excel** (opcional; CSV ya cubre export básico) | ⏳ Opcional |
-| 3 | Outlook / sync cron (v1.1) | ⏳ Futuro |
-| 4 | Integración Hacienda CR | ❌ Fase 3 — no tocar |
+| 0 | **GitHub** | Tú | ✅ |
+| 1 | **Deploy Vercel** + login prod | Tú | ✅ |
+| 2 | **Gmail en producción** | Tú | ✅ Probado (sync + IA en factura de prueba) |
+| 3 | **Export Excel** | Código | ✅ Local (`exceljs`); push a GitHub si falta |
+| 4 | **Piloto 1 cliente** (contador / multi-negocio acotado) | Tú | ⏳ Por ofrecer |
+| 5 | Outlook / sync cron (v1.1) | ⏳ Futuro |
+| 6 | Reenvío correo → buzón de la app (inbound email) | ⏳ Futuro — hoy es Gmail OAuth |
+| 7 | Integración Hacienda CR | ❌ Fase 3 — no tocar |
 
 ---
 
@@ -110,20 +121,62 @@ Chat IA (/dashboard/chat) — preguntas sobre facturas confirmadas
 
 ---
 
-## Deploy Vercel (checklist)
+## Deploy Vercel ✅
 
-**Guía completa:** [`DEPLOY-VERCEL.md`](./DEPLOY-VERCEL.md)
+**URL:** https://conta-copilot-mvp-chat-ia-gmail-v1.vercel.app  
+**Guía:** [`DEPLOY-VERCEL.md`](./DEPLOY-VERCEL.md)
 
-Resumen:
+Resumen post-deploy:
 
-1. Repo en GitHub (sin `.env.local`).
-2. Importar proyecto en [vercel.com](https://vercel.com).
-3. Variables de entorno: copiar desde `.env.local.example` / `.env.local` (Vercel → Settings → Environment Variables).
-4. **Supabase** → Authentication → Site URL = `https://tu-dominio.vercel.app` → Redirect URLs incluyen `/auth/callback`.
-5. **Google Cloud** → OAuth redirect autorizado: `https://tu-dominio.vercel.app/api/gmail/callback`.
-6. En Vercel: `NEXT_PUBLIC_APP_URL=https://tu-dominio.vercel.app`, `GOOGLE_REDIRECT_URI` = mismo callback producción.
-7. `npm run build` local debe pasar antes del deploy.
-8. Probar: login → dashboard → Gmail conectar → sync.
+1. Variables: **8** en pestañas **Production** y **Preview** (mismos valores).
+2. Nombre crítico: `NEXT_PUBLIC_SUPABASE_ANON_KEY` (no `..._ANON`).
+3. Supabase Site URL + `/auth/callback` con dominio `*.vercel.app`.
+4. Google: `/api/gmail/callback` en prod.
+5. Facturas prueba: `public/test-invoices/` o URL `/test-invoices/factura-prueba-gmail.html`.
+
+---
+
+## Piloto beta (plan acordado)
+
+**Perfil:** persona con muchos negocios / alto volumen de facturas — validar solo si el alcance es **acotado**.
+
+| Tema | Regla del piloto |
+|------|------------------|
+| Duración | 2–4 semanas |
+| Alcance | **1 negocio**, facturas del **mes en curso** |
+| Valor sin Hacienda | Recibir, ordenar, revisar, **Excel** — suficiente para validar |
+| IA | **Opcional** — Gmail sync **no** dispara IA; botón «Procesar con IA» factura a factura |
+| Demo sin gastar OpenAI | Solo **Sincronizar** + revisar + export; no subir masivo ni Chat |
+| Límite sugerido | ~30–50 facturas con IA el primer mes (proteger crédito OpenAI) |
+| Precio beta orientativo | Gratis 1.er mes a cambio de feedback, o **USD 10–18/mes** (₡5 000–9 000) |
+
+**Mensaje clave al cliente:** beta, sin Hacienda, IA opcional, empezar con un negocio.
+
+---
+
+## Costos de arranque (referencia)
+
+| Servicio | Pagado inicial | Notas |
+|----------|----------------|--------|
+| OpenAI | USD 5 (crédito) | Variable; cada «Procesar con IA» y subida manual consumen |
+| Google Cloud | USD 10 (mínimo cuenta) | Gmail API suele ser ~USD 0 en uso piloto |
+| Vercel + Supabase | USD 0 en beta chica | Pro/Supabase Pro si crece tráfico |
+
+**Modo sin IA:** mismo producto para organizar facturas (Gmail + revisión manual + Excel); la IA es capa opcional, no obligatoria.
+
+---
+
+## Límites técnicos (volumen alto)
+
+| Límite | Valor |
+|--------|--------|
+| Gmail por sync | 50 mensajes |
+| Backfill inicial | Mes actual (CR) |
+| Lista facturas | 200 filas |
+| IA en sync Gmail | No automática |
+| IA en subida manual | Sí automática (cuidado en demo) |
+
+**Futuro si piloto exige volumen:** IA en lote, más mensajes/sync, paginación, tope por plan, inbound email (reenvío a `facturas@...`).
 
 ---
 
@@ -141,7 +194,7 @@ Resumen:
 | `/api/gmail/connect` | Inicia OAuth Google (redirect) |
 | `/api/gmail/callback` | Callback OAuth + 1.ª sync |
 | `/api/debug/env` | Comprobar env vars (sin secretos) |
-| `/api/invoices/export` | Descarga CSV (filtros GET) |
+| `/api/invoices/export` | Excel por defecto; `?format=csv` para CSV |
 
 ---
 
@@ -399,14 +452,16 @@ npm run build
 npm run check:supabase   # health API Supabase
 ```
 
-Diagnóstico: `http://localhost:3000/api/debug/env` → `anonLooksValid: true`
+Diagnóstico local: `http://localhost:3000/api/debug/env`  
+Diagnóstico prod: `https://conta-copilot-mvp-chat-ia-gmail-v1.vercel.app/api/debug/env`
 
 ---
 
 ## Convenciones de código
 
 - UI y mensajes en **español**
-- Auth, subida, revisión vía **Server Actions** (no Supabase directo en browser para auth/upload)
+- Auth login/signup: **cliente** (`auth-form.tsx` + `@/lib/supabase/client`); inyección runtime `SupabasePublicEnv` en `layout.tsx`
+- Subida, revisión vía **Server Actions**
 - `await createClient()` desde `@/lib/supabase/server`
 - `supabase.auth.getUser()` para autorizar (no `getSession` en server)
 - IA **propone**, humano **confirma**
@@ -427,6 +482,9 @@ Diagnóstico: `http://localhost:3000/api/debug/env` → `anonLooksValid: true`
 | Falta nº factura / retención | Campos + `add-invoice-fields.sql` + prompt IA |
 | `GMAIL_TOKEN_ENCRYPTION_KEY` missing | Generar clave → `.env.local` → reiniciar `npm run dev` |
 | Internal Server Error / login colgado | Disco C: lleno (ENOSPC) → liberar espacio → borrar `.next` → reiniciar dev |
+| Vercel build falla Supabase en prerender | Env vars + commits `8355ed7`/`bebaa11`; dashboard/login dinámicos |
+| Login prod: `NEXT_PUBLIC_SUPABASE_ANON` mal nombrado | Usar `NEXT_PUBLIC_SUPABASE_ANON_KEY` completa |
+| Login prod: "page couldn't load" | Supabase Site URL + fix auth cliente `4b1df54` |
 
 ---
 
@@ -436,7 +494,8 @@ Diagnóstico: `http://localhost:3000/api/debug/env` → `anonLooksValid: true`
 - Facturas **rechazadas** no se editan ni reprocesan
 - Facturas confirmadas **antes** de `add-invoice-fields.sql` no tienen número/retención en DB
 - Moneda mixta CRC/USD en stats: se suman sin conversión (MVP)
-- Facturas de prueba en **EUR** u otros países no reflejan campos ni IVA costarricense
+- Facturas de prueba HTML/PDF: `public/test-invoices/` (ver `LEEME.md`)
+- Facturas en **EUR** u otros países no reflejan formato CR típico
 - Sin parseo de XML v4.4 ni campos fiscales completos (clave 50 dígitos, CABYS, cédulas)
 - Sin paginación en tabla de facturas (máx. 200 resultados)
 - Gmail sync: máx. 50 mensajes por ejecución; adjuntos válidos según `constants.ts`; sin historial de chat en DB
@@ -454,7 +513,7 @@ Ver prompt completo en [`PROMPTS-AGENTES.md`](PROMPTS-AGENTES.md) §0 o [`AGENTE
 Eres mi Agente Coordinador (Ask) de Conta Copilot.
 Ruta: C:\Users\Fran\Desktop\conta-copilot
 Lee CONTINUAR.md y AGENTES.md. Planifica y prepara prompts para Código/Supabase/Debug.
-MVP ✅ + Post-MVP v1 ✅ (chat IA + Gmail conectado y verificado). Siguiente: deploy Vercel → Excel opcional. Hacienda v2 fuera de scope. Español.
+MVP ✅ + Post-MVP v1 ✅. Producción Vercel ✅ (login OK). Siguiente: Gmail prod, Excel opcional. Hacienda v2 fuera de scope. Español.
 ```
 
 ### Ejecutor (Agent — chat nuevo por tarea)
@@ -463,9 +522,9 @@ MVP ✅ + Post-MVP v1 ✅ (chat IA + Gmail conectado y verificado). Siguiente: d
 Continúa Conta Copilot en C:\Users\Fran\Desktop\conta-copilot.
 Lee CONTINUAR.md (handoff completo).
 
-Estado: MVP + Post-MVP v1 completos y verificados (Gmail conectado en local).
+Estado: MVP + Post-MVP v1 ✅. Producción: https://conta-copilot-mvp-chat-ia-gmail-v1.vercel.app
 
-Siguiente: deploy Vercel (prioridad), Excel opcional. Hacienda = v2 (no tocar).
+Siguiente: Gmail en prod, Excel opcional. Hacienda = v2 (no tocar).
 UI en español. No pedir API keys en el chat.
 ```
 
@@ -486,4 +545,4 @@ El usuario prefiere comunicación en **español**.
 
 ---
 
-*Última actualización: Post-MVP v1 verificado (Gmail conectado). Siguiente: deploy Vercel → Excel opcional. Hacienda = v2.*
+*Última actualización: mayo 2026 — Pausa tras prod OK (login, Gmail, IA). Piloto pendiente. Commit deploy: `db9df67`. Excel export en local sin push.*

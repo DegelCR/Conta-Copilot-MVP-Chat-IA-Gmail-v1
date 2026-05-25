@@ -1,54 +1,45 @@
 # Agent Handoff — Conta Copilot
 
-Documento breve para continuar con otro agente. **La fuente de verdad actualizada es [`CONTINUAR.md`](./CONTINUAR.md)** — léelo completo antes de codear.
+**Fuente de verdad:** [`CONTINUAR.md`](./CONTINUAR.md) · **Deploy:** [`DEPLOY-VERCEL.md`](./DEPLOY-VERCEL.md)
 
 ---
 
-## Estado rápido (Mayo 2026)
+## Estado (mayo 2026) — pausa
 
 | Área | Estado |
 |------|--------|
-| MVP completo | ✅ |
-| Chat IA (`/dashboard/chat`) | ✅ |
-| Gmail v1 (`/dashboard/gmail`) | ✅ **Conectado y verificado** |
-| Export CSV | ✅ |
-| Deploy Vercel | ⏳ **Siguiente** |
-| Export Excel | ⏳ Opcional |
-| Hacienda CR | ❌ Fase 3 |
+| Producción | ✅ https://conta-copilot-mvp-chat-ia-gmail-v1.vercel.app |
+| Login + Gmail + IA en prod | ✅ verificado por el usuario |
+| Export Excel | ✅ código local; verificar push a `master` |
+| Piloto comercial | ⏳ siguiente paso humano |
+| Hacienda | ❌ fase 3 |
 
-**Supabase ref:** `gufhkxexvqxhnmubmhuq`  
-**Ruta:** `C:\Users\Fran\Desktop\conta-copilot`
+**Git:** `master` · deploy `db9df67` · cambios locales sin commit (docs, Excel, test-invoices)
 
 ---
 
-## Flujo Gmail (operativo)
+## Piloto (resumen)
 
-Sincronizar → Facturas pendientes → Procesar con IA → Confirmar → Dashboard / Chat
-
----
-
-## Siguiente tarea (prioridad)
-
-1. **Deploy Vercel** — prod, env vars, Supabase Site URL, Google OAuth redirect producción
-2. Export Excel (opcional)
-3. Outlook / cron (v1.1)
-
-Detalle: `CONTINUAR.md` → secciones **Deploy Vercel** y **Flujo operativo Gmail**.
+- 1 negocio, mes actual, 2–4 semanas.
+- Valor: ordenar correo + Excel; Hacienda no.
+- IA opcional; demo sin IA = solo sync + revisión.
+- Contacto con muchas facturas: acotar o solo importar sin IA masiva.
 
 ---
 
-## Workflow agentes
+## Costos referencia
 
-Coordinador (Ask) → Código / Supabase / Debug · Ver [`ask.md`](./ask.md)
-
----
-
-## Reglas
-
-- Español en UI · No pedir API keys en chat · No Hacienda en MVP
-- Tras editar `.env.local` → reiniciar `npm run dev`
-- Disco lleno → Internal Server Error; liberar espacio + borrar `.next`
+- OpenAI: USD 5 crédito inicial.
+- Google Cloud: USD 10 (cuenta); Gmail API ~0 en piloto.
 
 ---
 
-*Ver CONTINUAR.md para detalle completo.*
+## Al retomar
+
+1. Ofrecer piloto / feedback.
+2. `git status` → push Excel + markdown + `public/test-invoices/`.
+3. Código futuro: límites IA, IA en lote, inbound email (reenvío).
+
+---
+
+*Pausa tras prod OK — mayo 2026.*

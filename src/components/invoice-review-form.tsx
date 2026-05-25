@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState } from "react";
+import { useActionState, useCallback, useEffect, useState } from "react";
 import {
   reviewInvoiceAction,
   type ReviewInvoiceState,
@@ -23,12 +23,58 @@ type InvoiceReviewFormProps = {
 
 const initialState: ReviewInvoiceState = {};
 
-function PreviewPanel({ invoice }: { invoice: InvoiceDetail }) {
+function PreviewToolbar({
+  fileName,
+  fileUrl,
+  onExpand,
+}: {
+  fileName: string | null;
+  fileUrl: string | null;
+  onExpand: () => void;
+}) {
+  return (
+    <div className="mb-2 flex flex-wrap items-center gap-2">
+      <button
+        type="button"
+        onClick={onExpand}
+        disabled={!fileUrl}
+        className="rounded-lg border border-emerald-600 bg-emerald-50 px-3 py-1.5 text-sm font-medium text-emerald-800 hover:bg-emerald-100 disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        Ampliar vista
+      </button>
+      {fileUrl && (
+        <a
+          href={fileUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-sm font-medium text-zinc-700 hover:bg-zinc-50"
+        >
+          Abrir en pestaña nueva
+        </a>
+      )}
+      {fileName && (
+        <span className="text-xs text-zinc-500 truncate max-w-[12rem] sm:max-w-none">
+          {fileName}
+        </span>
+      )}
+    </div>
+  );
+}
+
+function PreviewContent({
+  invoice,
+  className,
+}: {
+  invoice: InvoiceDetail;
+  className?: string;
+}) {
   const url = invoice.signedFileUrl;
 
   if (!url) {
     return (
-      <div className="flex h-full min-h-[320px] items-center justify-center rounded-xl bg-zinc-100 p-6 text-sm text-zinc-500">
+      <div
+        className={`flex min-h-[280px] items-center justify-center rounded-xl bg-zinc-100 p-6 text-sm text-zinc-500 ${className ?? ""}`}
+      >
         No se pudo cargar la vista previa del archivo.
       </div>
     );
@@ -36,12 +82,14 @@ function PreviewPanel({ invoice }: { invoice: InvoiceDetail }) {
 
   if (invoice.fileMime.startsWith("image/")) {
     return (
-      <div className="flex min-h-[320px] items-center justify-center overflow-hidden rounded-xl bg-zinc-100 p-4">
+      <div
+        className={`flex min-h-[280px] items-center justify-center overflow-auto rounded-xl bg-zinc-100 p-4 ${className ?? ""}`}
+      >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={url}
           alt={invoice.file_name ?? "Factura"}
-          className="max-h-[70vh] max-w-full rounded-lg object-contain"
+          className="max-h-full max-w-full rounded-lg object-contain"
         />
       </div>
     );
@@ -50,15 +98,15 @@ function PreviewPanel({ invoice }: { invoice: InvoiceDetail }) {
   if (invoice.fileMime === "application/pdf") {
     return (
       <iframe
-        src={url}
+        src={`${url}#view=FitH`}
         title={invoice.file_name ?? "Factura PDF"}
-        className="h-[70vh] w-full rounded-xl border border-zinc-200 bg-white"
+        className={`min-h-[280px] w-full rounded-xl border border-zinc-200 bg-white ${className ?? ""}`}
       />
     );
   }
 
   return (
-    <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-6">
+    <div className={`rounded-xl border border-zinc-200 bg-zinc-50 p-6 ${className ?? ""}`}>
       <p className="text-sm text-zinc-600">
         Vista previa no disponible para este formato.{" "}
         <a
@@ -71,6 +119,112 @@ function PreviewPanel({ invoice }: { invoice: InvoiceDetail }) {
         </a>
       </p>
     </div>
+  );
+}
+
+function PreviewExpandedModal({
+  invoice,
+  open,
+  onClose,
+}: {
+  invoice: InvoiceDetail;
+  open: boolean;
+  onClose: () => void;
+}) {
+  const handleEscape = useCallback(
+    (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+    },
+    [onClose],
+  );
+
+  useEffect(() => {
+    if (!open) return;
+    document.addEventListener("keydown", handleEscape);
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", handleEscape);
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [open, handleEscape]);
+
+  if (!open) return null;
+
+  const url = invoice.signedFileUrl;
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex flex-col bg-zinc-900/90"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Vista ampliada del documento"
+    >
+      <div className="flex shrink-0 items-center justify-between gap-4 border-b border-white/10 px-4 py-3 text-white">
+        <p className="truncate text-sm font-medium">
+          {invoice.file_name ?? "Documento"}
+        </p>
+        <div className="flex shrink-0 items-center gap-2">
+          {url && (
+            <a
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-lg border border-white/30 px-3 py-1.5 text-sm hover:bg-white/10"
+            >
+              Nueva pestaña
+            </a>
+          )}
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-lg bg-white px-3 py-1.5 text-sm font-medium text-zinc-900 hover:bg-zinc-100"
+          >
+            Cerrar
+          </button>
+        </div>
+      </div>
+      <div className="min-h-0 flex-1 p-3 sm:p-4">
+        {url && invoice.fileMime.startsWith("image/") ? (
+          <div className="flex h-full items-center justify-center overflow-auto rounded-lg bg-zinc-100">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={url}
+              alt={invoice.file_name ?? "Factura"}
+              className="max-h-full max-w-full object-contain"
+            />
+          </div>
+        ) : url && invoice.fileMime === "application/pdf" ? (
+          <iframe
+            src={`${url}#view=FitH`}
+            title={invoice.file_name ?? "Factura PDF"}
+            className="h-full w-full rounded-lg border border-zinc-200 bg-white"
+          />
+        ) : (
+          <p className="text-center text-sm text-white/80">No se pudo cargar el documento.</p>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function PreviewPanel({ invoice }: { invoice: InvoiceDetail }) {
+  const [expanded, setExpanded] = useState(false);
+
+  return (
+    <>
+      <PreviewToolbar
+        fileName={invoice.file_name}
+        fileUrl={invoice.signedFileUrl}
+        onExpand={() => setExpanded(true)}
+      />
+      <PreviewContent invoice={invoice} className="h-[min(70vh,640px)]" />
+      <PreviewExpandedModal
+        invoice={invoice}
+        open={expanded}
+        onClose={() => setExpanded(false)}
+      />
+    </>
   );
 }
 
@@ -94,7 +248,7 @@ export function InvoiceReviewForm({ invoice }: InvoiceReviewFormProps) {
   });
 
   return (
-    <div className="grid gap-8 lg:grid-cols-2">
+    <div className="grid gap-8 xl:grid-cols-[1.15fr_1fr]">
       <div>
         <h2 className="text-sm font-medium text-zinc-700">Documento original</h2>
         <div className="mt-3">

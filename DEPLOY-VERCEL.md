@@ -1,166 +1,214 @@
 # Deploy Conta Copilot en Vercel
 
-> Para que amigos/familiares prueben la app en internet (no solo `localhost`).
+> Guía de despliegue y producción. Actualizado tras deploy exitoso (mayo 2026).
 
 Ruta local: `C:\Users\Fran\Desktop\conta-copilot`
 
 ---
 
-## Antes de empezar
-
-- [x] `npm run build` pasa en local
-- [x] Código en GitHub
-- [ ] Proyecto importado en Vercel + env vars + redeploy
-- [ ] Supabase Site URL y Google OAuth con URL de producción
-- [x] Supabase project: `gufhkxexvqxhnmubmhuq`
-- [x] Google Cloud OAuth configurado (Gmail local)
-
----
-
-## Repositorio GitHub ✅
+## Producción actual ✅
 
 | Campo | Valor |
 |-------|--------|
-| **URL** | https://github.com/DegelCR/Conta-Copilot-MVP-Chat-IA-Gmail-v1 |
+| **URL app** | https://conta-copilot-mvp-chat-ia-gmail-v1.vercel.app |
+| **Panel Vercel** | https://vercel.com/degel-cr-s-projects/conta-copilot-mvp-chat-ia-gmail-v1 |
+| **GitHub** | https://github.com/DegelCR/Conta-Copilot-MVP-Chat-IA-Gmail-v1 |
 | **Rama** | `master` |
-| **Último commit** | `c2370e8` — *Conta Copilot MVP + Chat IA + Gmail v1* |
-| **Remote local** | `origin` → mismo repo |
+| **Commit estable** | `db9df67` (fixes build + login + env cliente) |
+| **Supabase ref** | `gufhkxexvqxhnmubmhuq` |
 
-**No está en GitHub:** `.env.local` (secretos — correcto).
+**Verificado en producción (mayo 2026):**
 
----
+- Landing y login (`frtest@gmail.com`)
+- Gmail: sync + procesar IA en factura de prueba (correo propio)
+- Variables: error común `NEXT_PUBLIC_SUPABASE_ANON` → corregir a `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 
-## Paso 1 — GitHub ✅ (hecho)
-
-```powershell
-cd C:\Users\Fran\Desktop\conta-copilot
-git remote -v
-# origin → https://github.com/DegelCR/Conta-Copilot-MVP-Chat-IA-Gmail-v1.git
-```
-
-Para futuros cambios:
-
-```powershell
-git add .
-git commit -m "Descripción del cambio"
-git push origin master
-```
+**No confundir:** la URL del panel `vercel.com/degel-cr-s-projects/...` **no** va en Supabase ni Google — solo la URL `*.vercel.app`.
 
 ---
 
-## Paso 2 — Importar en Vercel
+## Checklist de estado
 
-1. [vercel.com](https://vercel.com) → **Add New** → **Project**
-2. Importa **`DegelCR/Conta-Copilot-MVP-Chat-IA-Gmail-v1`**
-3. Framework: **Next.js** (auto-detectado)
-4. **Antes del deploy que quieras que pase:** añade variables del **Paso 3** (mínimo Supabase + OpenAI). Si el primer deploy falla en build, es normal — completa Paso 3 y **Redeploy**.
-
-Anota tu URL, ej: `https://conta-copilot-mvp-chat-ia-gmail-v1.vercel.app`
+- [x] Repo en GitHub
+- [x] Proyecto importado en Vercel
+- [x] Variables en **Production** y **Preview** (8 variables, ver abajo)
+- [x] Build **Ready**
+- [x] Login producción
+- [x] Gmail sync + flujo factura en prod (usuario verificó)
+- [ ] Push pendiente: export Excel + docs + `public/test-invoices/` (si aún no en `master`)
 
 ---
 
-## Paso 3 — Variables de entorno en Vercel (obligatorio para el build)
+## Variables de entorno en Vercel
 
-**Settings → Environment Variables** → marca **Production** y **Preview** en cada una:
+### UI de Vercel (importante)
 
-| Variable | Valor |
-|----------|--------|
+Vercel muestra **3 pestañas**: **Production**, **Preview**, **Development**.
+
+- Al entrar en una pestaña, solo añades variables **de ese entorno** (no hay casillas para marcar varias).
+- Hay que **repetir las 8 variables** en **Production** y en **Preview** (mismo nombre y valor).
+- **Development** se puede omitir (desarrollo local usa `.env.local`).
+
+### Las 8 variables (nombres exactos)
+
+| Variable | Valor en producción |
+|----------|---------------------|
 | `NEXT_PUBLIC_SUPABASE_URL` | `https://gufhkxexvqxhnmubmhuq.supabase.co` |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | *(copiar de `.env.local`)* |
-| `OPENAI_API_KEY` | *(copiar de `.env.local`)* |
-| `NEXT_PUBLIC_APP_URL` | `https://TU-DOMINIO.vercel.app` *(tu URL real de Vercel)* |
-| `GOOGLE_CLIENT_ID` | *(copiar de `.env.local`)* |
-| `GOOGLE_CLIENT_SECRET` | *(copiar de `.env.local`)* |
-| `GOOGLE_REDIRECT_URI` | `https://TU-DOMINIO.vercel.app/api/gmail/callback` |
-| `GMAIL_TOKEN_ENCRYPTION_KEY` | *(misma clave que en local)* |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Clave **anon public completa** (`eyJ...`) — ver nota abajo |
+| `OPENAI_API_KEY` | De `.env.local` |
+| `NEXT_PUBLIC_APP_URL` | `https://conta-copilot-mvp-chat-ia-gmail-v1.vercel.app` |
+| `GOOGLE_CLIENT_ID` | De `.env.local` |
+| `GOOGLE_CLIENT_SECRET` | De `.env.local` |
+| `GOOGLE_REDIRECT_URI` | `https://conta-copilot-mvp-chat-ia-gmail-v1.vercel.app/api/gmail/callback` |
+| `GMAIL_TOKEN_ENCRYPTION_KEY` | **La misma** que en `.env.local` (generada con PowerShell u `openssl`) |
 
-**Crítico:** Sin `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_ANON_KEY` el build falla con:
+### ⚠️ Nombre correcto de la clave anon
+
+| ❌ Incorrecto | ✅ Correcto |
+|---------------|-------------|
+| `NEXT_PUBLIC_SUPABASE_ANON` | `NEXT_PUBLIC_SUPABASE_ANON_KEY` |
+
+Si el nombre está mal, el build o el login fallan con: *Your project's URL and API key are required*.
+
+### Seguridad de claves
+
+| Variable | ¿Va completa en Vercel? | ¿Es secreto? |
+|----------|-------------------------|--------------|
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | **Sí, entera** | Pública por diseño (RLS protege datos) |
+| `NEXT_PUBLIC_SUPABASE_URL` | Sí | No |
+| `OPENAI_API_KEY` | Sí | **Sí** — solo servidor |
+| `GOOGLE_CLIENT_SECRET` | Sí | **Sí** |
+| `GMAIL_TOKEN_ENCRYPTION_KEY` | Sí | **Sí** — misma clave que local si ya conectaste Gmail |
+
+No recortes la anon key “por seguridad” en Vercel. No subas `.env.local` a GitHub.
+
+Tras cualquier cambio → **Deployments → Redeploy** (idealmente sin caché si el build sigue viejo).
+
+---
+
+## Supabase Auth (producción)
+
+**Authentication → URL Configuration:**
+
+| Campo | Valor |
+|-------|--------|
+| **Site URL** | `https://conta-copilot-mvp-chat-ia-gmail-v1.vercel.app` |
+| **Redirect URLs** | `https://conta-copilot-mvp-chat-ia-gmail-v1.vercel.app/auth/callback` |
+| *(opcional local)* | `http://localhost:3000/auth/callback` |
+
+---
+
+## Google Cloud (Gmail en producción)
+
+**Credentials → OAuth client → Authorized redirect URIs:**
 
 ```text
-Error: @supabase/ssr: Your project's URL and API key are required...
-prerendering page "/dashboard/chat"
-```
-
-Tras guardar → **Deployments** → último deploy → **⋮** → **Redeploy** (no basta con guardar vars; hay que redeployar).
-
----
-
-## Paso 4 — Supabase Auth
-
-Supabase Dashboard → **Authentication** → **URL Configuration**:
-
-| Campo | Valor |
-|-------|--------|
-| **Site URL** | `https://TU-DOMINIO.vercel.app` |
-| **Redirect URLs** | `https://TU-DOMINIO.vercel.app/auth/callback` |
-| | `http://localhost:3000/auth/callback` *(opcional, para seguir en local)* |
-
----
-
-## Paso 5 — Google Cloud (Gmail OAuth)
-
-[Google Cloud Console](https://console.cloud.google.com/) → **APIs & Services** → **Credentials** → tu OAuth client:
-
-**Authorized redirect URIs** — añadir (mantener localhost si desarrollas local):
-
-```
-https://TU-DOMINIO.vercel.app/api/gmail/callback
+https://conta-copilot-mvp-chat-ia-gmail-v1.vercel.app/api/gmail/callback
 http://localhost:3000/api/gmail/callback
 ```
 
-**OAuth consent screen** → **Test users**: añade el Gmail de cada persona que probará (mientras la app esté en modo *Testing*).
+**OAuth consent screen → Test users:** correos que probarán Gmail (modo Testing).
+
+`GOOGLE_REDIRECT_URI` en Vercel debe coincidir **exacto** con la URI de Google.
 
 ---
 
-## Paso 6 — Probar en producción
+## Diagnóstico rápido
 
-1. Abre `https://TU-DOMINIO.vercel.app`
-2. **Registro** o login (correo de prueba)
-3. Subir factura → revisar → confirmar
-4. **Gmail** → conectar → sincronizar
-5. **Chat** → pregunta sobre facturas confirmadas
+```text
+https://conta-copilot-mvp-chat-ia-gmail-v1.vercel.app/api/debug/env
+```
 
-Comparte la URL con tu amigo/familiar. Cada uno necesita **su propia cuenta** (signup).
+Respuesta esperada:
+
+```json
+{
+  "supabaseUrlConfigured": true,
+  "supabaseAnonConfigured": true,
+  "anonLooksValid": true
+}
+```
+
+Si `false` → revisar nombres y valores en pestaña **Production** → Redeploy.
 
 ---
 
-## Errores frecuentes en producción
+## Probar en producción
+
+1. Login: https://conta-copilot-mvp-chat-ia-gmail-v1.vercel.app/login  
+   Usuario de prueba: `frtest@gmail.com` (contraseña en gestor local, no en docs).
+2. Dashboard → subir factura o usar factura de prueba.
+3. Gmail → conectar → sincronizar (requiere Google configurado).
+4. Chat → pregunta sobre facturas confirmadas.
+
+### Facturas de prueba (sin enviar email desde el agente)
+
+Archivos en `public/test-invoices/`:
+
+- `factura-prueba-gmail.html` → abrir → Imprimir → PDF → enviarte por Gmail como adjunto.
+- URL: https://conta-copilot-mvp-chat-ia-gmail-v1.vercel.app/test-invoices/factura-prueba-gmail.html  
+- Instrucciones: `public/test-invoices/LEEME.md`
+
+Correo típico de prueba Gmail: `franciscojavier.gonzalez5@gmail.com`.
+
+---
+
+## Errores frecuentes (resueltos en conversación)
 
 | Síntoma | Causa | Fix |
 |---------|--------|-----|
-| Build falla en `/dashboard/chat` — Supabase URL and API key required | Faltan env vars en Vercel (o no redeployaste) | Paso 3: `NEXT_PUBLIC_SUPABASE_*` + **Redeploy** |
-| Login no funciona / página no carga tras entrar | Site URL o Redirect URLs en Supabase incorrectas; o bucle de cookies (redeploy con fix auth) | Paso 4 + último commit en GitHub |
-| Gmail redirect error | URI distinta en Google vs Vercel | Pasos 3 y 5 deben coincidir exacto |
-| Access blocked Google | Usuario no en Test users | OAuth consent screen |
-| Gmail tokens inválidos | Cambiaste `GMAIL_TOKEN_ENCRYPTION_KEY` | Usar la misma clave o desconectar/reconectar Gmail |
-| 500 al subir factura | Falta `OPENAI_API_KEY` en Vercel | Paso 3 |
+| Build falla en `/dashboard/chat` o `/signup` — Supabase URL/key required | Env vars faltantes en build o pre-render | Commits `8355ed7`, `bebaa11`; vars + Redeploy |
+| Login se queda cargando; consola: Supabase URL and API key required | `NEXT_PUBLIC_SUPABASE_ANON` mal nombrada o key recortada | Renombrar a `NEXT_PUBLIC_SUPABASE_ANON_KEY` (completa); commit `db9df67` |
+| "This page couldn't load" tras login | Bucle cookies / server action sin sesión | Login cliente en `auth-form.tsx` (`4b1df54`) + Supabase Site URL |
+| Redirect en Supabase mal | URL del panel Vercel en lugar de `*.vercel.app` | Usar URL **Visit** del deploy |
+| Gmail redirect error | URI distinta Google vs Vercel | Alinear Paso Google + `GOOGLE_REDIRECT_URI` |
+| Gmail tokens inválidos | Otra `GMAIL_TOKEN_ENCRYPTION_KEY` en prod | Misma clave que `.env.local` o reconectar Gmail |
+
+---
+
+## Fixes de código incluidos en repo
+
+| Commit | Qué hace |
+|--------|----------|
+| `8355ed7` | Dashboard dinámico; SignOut lazy |
+| `4b1df54` | Login/registro con Supabase en el navegador |
+| `bebaa11` | Auth form sin crear cliente en SSR |
+| `db9df67` | Inyección `window.__CONTA_SUPABASE_ENV` + `next.config` env |
+
+---
+
+## GitHub — push de cambios
+
+```powershell
+cd C:\Users\Fran\Desktop\conta-copilot
+git add .
+git commit -m "Descripción"
+git push origin master
+```
+
+Vercel despliega automático en push a `master`.
 
 ---
 
 ## Comandos útiles
 
 ```powershell
-cd C:\Users\Fran\Desktop\conta-copilot
-npm run build          # verificar antes de deploy
-npm run check:supabase # health Supabase (local)
-```
-
-Deploy alternativo sin GitHub (CLI):
-
-```powershell
-npm i -g vercel
-vercel login
-vercel --prod
+npm run build
+npm run check:supabase
+npm run dev
 ```
 
 ---
 
 ## Siguiente después del deploy
 
-- Dominio propio en Vercel (opcional)
-- Publicar app OAuth en Google (salir de *Testing*) cuando tengas más usuarios
-- Excel export, Outlook v1.1, Hacienda fase 3
+- [x] Probar login y Gmail en prod
+- [ ] Ofrecer **piloto beta** (ver `CONTINUAR.md` → Piloto beta)
+- [ ] `git push` cambios locales (Excel, docs, facturas prueba) si aplica
+- Dominio propio (opcional)
+- Salir de modo *Testing* en Google cuando haya más usuarios
+- Outlook, inbound email, IA en lote, Hacienda fase 3
 
 ---
 
-*Última actualización: mayo 2026 — GitHub ✅ · Siguiente: importar en Vercel.*
+*Última actualización: mayo 2026 — Prod OK. Pausa desarrollo. Piloto comercial siguiente paso.*

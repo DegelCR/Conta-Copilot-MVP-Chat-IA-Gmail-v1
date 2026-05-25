@@ -75,7 +75,7 @@ Ver prompt completo en [Prompt — Agente Coordinador](#prompt--agente-coordinad
 ```
 ## Contexto de coordinación
 - MVP completo; Hacienda = v2 (no tocar)
-- Post-MVP actual: [deploy Vercel | Excel | Outlook v1.1 | otro]
+- Post-MVP actual: [piloto cliente | push Excel | límites IA | inbound email | otro]
 - Supabase ref: gufhkxexvqxhnmubmhuq
 - [Resultado previo o restricción, si aplica]
 ```
@@ -99,8 +99,9 @@ Eres mi Agente Coordinador (Ask) de Conta Copilot.
 Ruta: C:\Users\Fran\Desktop\conta-copilot
 Lee CONTINUAR.md (estado), AGENTES.md (flujo agentes).
 
-MVP ✅ + Post-MVP v1 ✅ (Gmail conectado y verificado).
-Post-MVP pendiente: deploy Vercel (prioridad) → Excel opcional → Outlook v1.1. Hacienda v2 (NO tocar).
+MVP ✅ + Post-MVP v1 ✅ en producción (login, Gmail, IA probados).
+Pausa mayo 2026. Siguiente: piloto 1 cliente. Push pendiente: Excel + docs. Hacienda v2 (NO).
+Producción: https://conta-copilot-mvp-chat-ia-gmail-v1.vercel.app
 Supabase ref: gufhkxexvqxhnmubmhuq · Migraciones: schema, storage, add-invoice-fields, add-document-type, add-gmail (ejecutadas).
 
 ## Al preparar prompts para otros agentes
@@ -144,9 +145,11 @@ Antes de escribir Next.js, revisa node_modules/next/dist/docs/ (APIs distintas a
 - Chat IA /dashboard/chat (sendChatMessageAction, chat-context.ts)
 - Gmail v1 /dashboard/gmail (OAuth, sync, ingest.ts, lib/gmail/, token-encryption)
 
-## Prioridad actual (Post-MVP)
-1. Deploy Vercel (+ OAuth redirect producción)
-2. Export Excel (opcional; CSV ya existe)
+## Prioridad actual (al retomar)
+1. Piloto comercial acotado (1 negocio, mes actual)
+2. Push Excel + markdown + test-invoices a GitHub
+3. Límites IA / IA en lote / inbound email (si el piloto lo pide)
+4. Hacienda — no tocar
 3. Outlook / cron sync (v1.1)
 4. Hacienda = v2 (no tocar)
 
@@ -315,8 +318,8 @@ Tarea: [detalle]
 
 | Agente | Hecho | Siguiente |
 |--------|-------|-----------|
-| **Coordinador** | Post-MVP v1 verificado (Gmail) | Deploy Vercel |
-| **Código** | MVP + CSV + Chat IA + Gmail v1 ✅ | Deploy, Excel opcional |
+| **Coordinador** | Prod OK, pausa | Piloto cliente, push Excel/docs |
+| **Código** | MVP + v1 + Excel local | Límites IA, inbound email, batch |
 | **Supabase** | schema, storage, migraciones Gmail | Solo si hay SQL nuevo |
 | **Debug** | form anidado, JSX, OAuth env | — |
 
@@ -328,11 +331,12 @@ Tarea: [detalle]
 |---|-------|--------|--------|
 | 1 | Export CSV | Código | ✅ Hecho |
 | 2 | Chat IA | Código | ✅ Hecho |
-| 3 | Gmail automático v1 | Código + Supabase | ✅ Verificado (OAuth local) |
-| 4 | Deploy Vercel | Tú + Código | ⏳ **Siguiente** |
-| 5 | Export Excel | Código | Opcional |
-| 6 | Outlook / cron | Código | v1.1 |
-| 7 | Hacienda CR v2 | — | Fuera de scope MVP |
+| 3 | Gmail automático v1 | Código + Supabase | ✅ Verificado (local) |
+| 3b | GitHub | Tú | ✅ [repo](https://github.com/DegelCR/Conta-Copilot-MVP-Chat-IA-Gmail-v1) |
+| 4 | Deploy Vercel + pruebas prod | Tú | ✅ |
+| 5 | Export Excel | Código | ✅ local / push pendiente |
+| 6 | Piloto 1 cliente | Tú | ⏳ |
+| 7 | Outlook / inbound email / Hacienda | Futuro | ⏳ / ❌ |
 
 ---
 
@@ -349,4 +353,4 @@ Tarea: [detalle]
 
 ---
 
-*Última actualización: Post-MVP v1 verificado (Gmail). Siguiente: deploy Vercel.*
+*Última actualización: mayo 2026 — Pausa. Prod OK. Piloto pendiente.*

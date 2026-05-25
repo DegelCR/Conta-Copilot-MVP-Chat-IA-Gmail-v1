@@ -159,12 +159,15 @@ Detalle completo: [`CONTINUAR.md`](./CONTINUAR.md) → sección *Facturación Co
 
 ---
 
-## Despliegue (Vercel)
+## Despliegue (Vercel) ✅
 
-1. Sube el repo a GitHub.
-2. Importa en [vercel.com](https://vercel.com).
-3. Añade las mismas variables de entorno que en `.env.local`.
-4. En Supabase, actualiza **Site URL** y **Redirect URLs** con tu dominio de producción.
+**Producción:** https://conta-copilot-mvp-chat-ia-gmail-v1.vercel.app — login y Gmail verificados.
+
+Guía: [`DEPLOY-VERCEL.md`](./DEPLOY-VERCEL.md) · Piloto y límites: [`CONTINUAR.md`](./CONTINUAR.md)
+
+**Export:** Excel (principal) + CSV en `/dashboard/invoices` (cambio local; confirmar en GitHub).
+
+**Estado:** pausa desarrollo mayo 2026; siguiente paso = piloto comercial acotado.
 
 ---
 

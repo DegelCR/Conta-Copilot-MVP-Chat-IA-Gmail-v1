@@ -1,3 +1,117 @@
 # Ask — Chat Coordinador
 
 > **Movido a [`ask.md`](./ask.md)** — guía actualizada con estado MVP + Chat IA + Gmail v1.
+
+# Ask — Chat Coordinador (Conta Copilot)
+
+> Hoja de ruta del chat **Coordinador (Ask)**: planificación, prompts, estado, negocio, Hacienda, deploy.  
+> **No enredarte entre chats:** Coordinador → [Supabase si SQL] → Código → pruebas tú → Debug si falla.
+
+| Recurso | Ruta |
+|---------|------|
+| Proyecto | `C:\Users\Fran\Desktop\conta-copilot` |
+| Estado técnico | [`CONTINUAR.md`](./CONTINUAR.md) |
+| Deploy | [`DEPLOY-VERCEL.md`](./DEPLOY-VERCEL.md) |
+| Agentes | [`AGENTES.md`](./AGENTES.md) · [`PROMPTS-AGENTES.md`](./PROMPTS-AGENTES.md) |
+
+---
+
+## Índice
+
+1. [Estado del producto](#estado-del-producto)
+2. [Cambios realizados (historial)](#cambios-realizados-historial)
+3. [Flujos diarios](#flujos-diarios)
+4. [Roles y orden de chats](#roles-y-orden-de-chats)
+5. [Gmail — lo acordado](#gmail--lo-acordado)
+6. [Variables de entorno](#variables-de-entorno)
+7. [Deploy gratis (GitHub + Vercel)](#deploy-gratis-github--vercel)
+8. [IA vs XML — estrategia](#ia-vs-xml--estrategia)
+9. [Hacienda — mensajes y sandbox](#hacienda--mensajes-y-sandbox)
+10. [Roadmap técnico y negocio](#roadmap-técnico-y-negocio)
+11. [Deuda y mejoras](#deuda-y-mejoras)
+12. [Prompts listos](#prompts-listos)
+13. [Esta semana](#esta-semana)
+14. [Frases para este chat](#frases-para-este-chat)
+
+---
+
+## Estado del producto
+
+| Área | Estado |
+|------|--------|
+| MVP (auth, upload, IA, revisión, stats, CSV) | ✅ |
+| Chat IA `/dashboard/chat` | ✅ |
+| Gmail v1 `/dashboard/gmail` (OAuth, sync, dedup) | ✅ Verificado local |
+| SQL `add-gmail.sql` + tablas Gmail | ✅ |
+| `ingestInvoiceFile` + `src/lib/gmail/*` | ✅ |
+| Google OAuth + `.env.local` | ✅ |
+| `GMAIL_TOKEN_ENCRYPTION_KEY` | ✅ (local) |
+| **GitHub** | ✅ [Conta-Copilot-MVP-Chat-IA-Gmail-v1](https://github.com/DegelCR/Conta-Copilot-MVP-Chat-IA-Gmail-v1) · rama `master` · commit `c2370e8` |
+| **Deploy Vercel** | ⏳ **Siguiente** — ver [`DEPLOY-VERCEL.md`](./DEPLOY-VERCEL.md) |
+| Parser XML v4.4 sin IA | ⏳ Alto ROI — futuro |
+| Export Excel | ⏳ Opcional |
+| Outlook / cron Gmail | ⏳ v1.1 |
+| Integración API Hacienda | ❌ Fase 3 |
+
+**Supabase ref:** `gufhkxexvqxhnmubmhuq`
+
+---
+
+## Cambios realizados (historial)
+
+### MVP (completado antes)
+- Auth Server Actions, dashboard, upload, IA, revisión, tabla facturas, CSV, `document_type`, número/retención.
+
+### Post-MVP v1 (completado — mayo 2026)
+| Cambio | Detalle |
+|--------|---------|
+| **Chat IA** | `/dashboard/chat`, `src/app/actions/chat.ts` |
+| **Gmail v1** | `/dashboard/gmail`, OAuth `connect`/`callback`, sync manual |
+| **SQL** | `supabase/add-gmail.sql`: `gmail_connections`, `gmail_imports`, `invoices.source` / `source_meta` |
+| **Ingest** | `src/lib/invoices/ingest.ts` — upload manual delega aquí |
+| **Seguridad Gmail** | Tokens cifrados en server (`GMAIL_TOKEN_ENCRYPTION_KEY`) |
+| **Backfill** | Al conectar: desde 1.º del mes CR (máx. 30 días); luego incremental |
+| **Docs** | `CONTINUAR.md`, `DEPLOY-VERCEL.md`, `.env.local.example` |
+| **GitHub** | Repo público/privado según configuración — ver URL arriba |
+
+### Decisiones de producto (coordinación)
+- Solo **Gmail** en v1 (Outlook = v1.1).
+- Gmail conectado **puede ser distinto** del email de login Supabase.
+- Upload manual y Gmail **en paralelo**.
+- **No** historial completo de bandeja.
+- **No** auto-confirmar; IA propone, humano confirma.
+- Sync Gmail importa adjuntos; **«Procesar con IA»** en revisión si hace falta.
+- Hacienda integración API = **fase 3**; mensaje marketing = organización, no “evita multas”.
+
+---
+
+## Flujos diarios
+
+### Factura manual
+1. Dashboard → subir PDF/imagen/XML  
+2. Revisar → Confirmar / Rechazar  
+3. Totales del mes en dashboard  
+
+### Gmail
+1. `/dashboard/gmail` → Conectar (test user en Google Cloud)  
+2. **Sincronizar correo ahora**  
+3. `/dashboard/invoices` → `pending_review`, badge Gmail  
+4. **Procesar con IA** → Confirmar  
+5. Chat sobre confirmadas  
+
+### Cierre de mes (concepto)
+- Backfill al conectar ≈ facturas del **mes en curso** (no “últimos 30 días rodantes” como regla principal).
+- Export CSV con filtros → contador / declaración manual.
+
+---
+
+## Roles y orden de chats
+
+| Chat | Regla | Modo | Cuándo |
+|------|-------|------|--------|
+| **Coordinador** | `agente-preguntas` | **Ask** | Fijo |
+| **Código** | `agente-codigo` | Agent | Feature / deploy |
+| **Supabase** | `agente-supabase` | Agent | 1 migración SQL |
+| **Debug** | `agente-debug` | Agent | Build / OAuth / pantalla blanca |
+
+### Orden típico (nueva feature con DB)

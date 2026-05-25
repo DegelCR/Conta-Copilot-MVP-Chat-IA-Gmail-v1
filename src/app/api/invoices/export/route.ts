@@ -5,6 +5,7 @@ import {
   buildInvoicesExportFilename,
   invoicesToCsv,
 } from "@/lib/invoices/export-csv";
+import { invoicesToXlsxBuffer } from "@/lib/invoices/export-xlsx";
 import { listInvoicesForUser } from "@/lib/invoices/queries";
 
 export async function GET(request: Request) {
@@ -23,14 +24,26 @@ export async function GET(request: Request) {
     rawParams[key] = value;
   });
 
+  const format = searchParams.get("format") === "csv" ? "csv" : "xlsx";
   const filters = parseInvoiceListFilters(rawParams);
   const invoices = await listInvoicesForUser(filters);
-  const csv = invoicesToCsv(invoices);
-  const filename = buildInvoicesExportFilename();
+  const filename = buildInvoicesExportFilename(format);
 
-  return new NextResponse(`\uFEFF${csv}`, {
+  if (format === "csv") {
+    const csv = invoicesToCsv(invoices);
+    return new NextResponse(`\uFEFF${csv}`, {
+      headers: {
+        "Content-Type": "text/csv; charset=utf-8",
+        "Content-Disposition": `attachment; filename="${filename}"`,
+      },
+    });
+  }
+
+  const buffer = await invoicesToXlsxBuffer(invoices);
+  return new NextResponse(new Uint8Array(buffer), {
     headers: {
-      "Content-Type": "text/csv; charset=utf-8",
+      "Content-Type":
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
       "Content-Disposition": `attachment; filename="${filename}"`,
     },
   });
