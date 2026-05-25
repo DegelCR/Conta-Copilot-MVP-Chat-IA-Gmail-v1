@@ -14,7 +14,7 @@ Ruta: `C:\Users\Fran\Desktop\conta-copilot` · Fuente de verdad: [`CONTINUAR.md`
 | MVP + Chat + Gmail | ✅ |
 | **Producción Vercel** | ✅ login, Gmail, IA probados |
 | **Export Excel** | ✅ en código local (pendiente push) |
-| **Piloto 1 cliente** | ⏳ Por ofrecer (ver `CONTINUAR.md`) |
+| **Piloto 1 cliente** | ⏳ Manuales en `docs/MANUAL-USUARIO.md` y `docs/MANUAL-ADMIN.md` |
 | Hacienda CR | ❌ Fase 3 |
 
 **URL:** https://conta-copilot-mvp-chat-ia-gmail-v1.vercel.app
