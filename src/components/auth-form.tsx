@@ -14,7 +14,6 @@ type AuthFormProps = {
 export function AuthForm({ mode }: AuthFormProps) {
   const isLogin = mode === "login";
   const router = useRouter();
-  const supabase = createClient();
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
@@ -24,6 +23,8 @@ export function AuthForm({ mode }: AuthFormProps) {
     setPending(true);
     setError(null);
     setMessage(null);
+
+    const supabase = createClient();
 
     const formData = new FormData(event.currentTarget);
     const email = String(formData.get("email") ?? "").trim();
