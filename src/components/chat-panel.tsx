@@ -5,6 +5,7 @@ import {
   sendChatMessageAction,
   type ChatActionState,
 } from "@/app/actions/chat";
+import { FiscalDisclaimer } from "@/components/fiscal-disclaimer";
 
 type ChatMessage = {
   role: "user" | "assistant";
@@ -62,6 +63,9 @@ export function ChatPanel() {
 
   return (
     <div className="flex min-h-[32rem] flex-col rounded-xl border border-zinc-200 bg-white">
+      <div className="border-b border-zinc-100 p-4 sm:p-6 sm:pb-0">
+        <FiscalDisclaimer variant="chat" />
+      </div>
       <div className="flex-1 space-y-4 overflow-y-auto p-4 sm:p-6">
         {messages.length === 0 && (
           <div className="rounded-lg bg-zinc-50 px-4 py-6 text-sm text-zinc-600">

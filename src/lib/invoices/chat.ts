@@ -1,4 +1,5 @@
 import OpenAI from "openai";
+import { FISCAL_DISCLAIMER_COMPACT } from "@/lib/legal/disclaimer";
 import { formatOpenAIError } from "@/lib/invoices/extract";
 
 const CHAT_MODEL = "gpt-4o-mini";
@@ -12,7 +13,7 @@ Reglas:
 - Monedas: CRC y USD pueden mezclarse; los totales del resumen mensual suman montos sin conversión de cambio — menciónalo si es relevante.
 - Gasto vs ingreso: respeta document_type (Gasto / Ingreso).
 - IVA del mes en el resumen corresponde a tax_amount de gastos confirmados del mes actual.
-- No des asesoría fiscal oficial ni sustituyas a un contador certificado.`;
+- ${FISCAL_DISCLAIMER_COMPACT} Si piden qué declarar ante Hacienda o estrategia fiscal, indícalo y remite a un profesional colegiado.`;
 
 export type ChatTurn = {
   role: "user" | "assistant";

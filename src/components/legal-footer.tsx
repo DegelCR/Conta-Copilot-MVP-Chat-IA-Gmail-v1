@@ -1,9 +1,10 @@
 import Link from "next/link";
+import { FiscalDisclaimer } from "@/components/fiscal-disclaimer";
 
 export function LegalFooter() {
   return (
-    <footer className="border-t border-zinc-200 bg-white px-4 py-6 text-center text-sm text-zinc-500 sm:px-6">
-      <nav className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
+    <footer className="border-t border-zinc-200 bg-white px-4 py-6 text-center sm:px-6">
+      <nav className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-sm text-zinc-500">
         <Link href="/privacidad" className="font-medium text-emerald-700 hover:underline">
           Política de privacidad
         </Link>
@@ -14,6 +15,9 @@ export function LegalFooter() {
           Términos de uso
         </Link>
       </nav>
+      <div className="mx-auto mt-3 max-w-xl">
+        <FiscalDisclaimer variant="compact" />
+      </div>
       <p className="mt-2 text-xs text-zinc-400">Conta Copilot — versión beta</p>
     </footer>
   );

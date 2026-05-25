@@ -15,6 +15,7 @@ import {
 import { INVOICE_CATEGORIES } from "@/lib/invoices/schema";
 import type { InvoiceDetail } from "@/lib/invoices/queries";
 import { totalsAreConsistent } from "@/lib/invoices/schema";
+import { FiscalDisclaimer } from "@/components/fiscal-disclaimer";
 import { ProcessInvoiceButton } from "@/components/process-invoice-button";
 
 type InvoiceReviewFormProps = {
@@ -448,7 +449,9 @@ export function InvoiceReviewForm({ invoice }: InvoiceReviewFormProps) {
           )}
 
           {isPending ? (
-            <div className="flex flex-wrap gap-3 pt-2">
+            <div className="space-y-3 pt-2">
+              <FiscalDisclaimer variant="compact" />
+              <div className="flex flex-wrap gap-3">
               <button
                 type="submit"
                 name="intent"
@@ -473,6 +476,7 @@ export function InvoiceReviewForm({ invoice }: InvoiceReviewFormProps) {
               >
                 Volver
               </Link>
+              </div>
             </div>
           ) : isConfirmed ? (
             <div className="flex flex-wrap gap-3 pt-2">

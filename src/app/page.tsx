@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { FiscalDisclaimer } from "@/components/fiscal-disclaimer";
 import { LegalFooter } from "@/components/legal-footer";
 
 export default function Home() {
@@ -35,6 +36,7 @@ export default function Home() {
             tus gastos desde un dashboard simple. Pensado para contadores, freelancers y
             pequeños negocios en Costa Rica.
           </p>
+          <FiscalDisclaimer variant="compact" className="mt-4 max-w-xl" />
           <div className="mt-10 flex flex-wrap gap-4">
             <Link
               href="/signup"

@@ -32,7 +32,14 @@ export default function TerminosPage() {
             con el Ministerio de Hacienda de Costa Rica.
           </li>
           <li>
-            <strong>No</strong> sustituye asesoría contable, fiscal o legal profesional.
+            <strong>No</strong> sustituye asesoría contable, fiscal o legal profesional ni la
+            relación con un contador público autorizado u otro profesional colegiado en Costa
+            Rica.
+          </li>
+          <li>
+            Las respuestas del chat y los totales del dashboard son <strong>informativos</strong>;
+            usted es responsable de cumplir sus obligaciones tributarias y de validar los datos
+            antes de usarlos en declaraciones o libros contables.
           </li>
         </ul>
       </section>
