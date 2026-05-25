@@ -61,6 +61,9 @@ Vercel muestra **3 pestañas**: **Production**, **Preview**, **Development**.
 | `GOOGLE_CLIENT_SECRET` | De `.env.local` |
 | `GOOGLE_REDIRECT_URI` | `https://conta-copilot-mvp-chat-ia-gmail-v1.vercel.app/api/gmail/callback` |
 | `GMAIL_TOKEN_ENCRYPTION_KEY` | **La misma** que en `.env.local` (generada con PowerShell u `openssl`) |
+| `NEXT_PUBLIC_CONTACT_EMAIL` | *(opcional)* correo visible en Privacidad y Términos |
+
+**Páginas legales:** `/privacidad` y `/terminos` (enlaces en footer de la app).
 
 ### ⚠️ Nombre correcto de la clave anon
 

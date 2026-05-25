@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { AuthForm } from "@/components/auth-form";
+import { LegalFooter } from "@/components/legal-footer";
 
 export default function LoginPage() {
   return (
@@ -12,6 +13,7 @@ export default function LoginPage() {
       <main className="flex flex-1 items-center justify-center px-4 py-12">
         <AuthForm mode="login" />
       </main>
+      <LegalFooter />
     </div>
   );
 }

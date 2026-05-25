@@ -140,6 +140,20 @@ export function AuthForm({ mode }: AuthFormProps) {
           </p>
         )}
 
+        {!isLogin && (
+          <p className="text-xs leading-relaxed text-zinc-500">
+            Al registrarse acepta los{" "}
+            <Link href="/terminos" className="font-medium text-emerald-700 hover:underline">
+              Términos de uso
+            </Link>{" "}
+            y la{" "}
+            <Link href="/privacidad" className="font-medium text-emerald-700 hover:underline">
+              Política de privacidad
+            </Link>
+            .
+          </p>
+        )}
+
         <button
           type="submit"
           disabled={pending}

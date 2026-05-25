@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { LegalFooter } from "@/components/legal-footer";
 
 export default function Home() {
   return (
@@ -75,6 +76,7 @@ export default function Home() {
           ))}
         </section>
       </main>
+      <LegalFooter />
     </div>
   );
 }

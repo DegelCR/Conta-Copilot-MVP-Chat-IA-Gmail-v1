@@ -1,7 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-const PUBLIC_PATHS = ["/", "/login", "/signup", "/auth"];
+const PUBLIC_PATHS = ["/", "/login", "/signup", "/auth", "/privacidad", "/terminos"];
 
 /** OAuth callbacks: Google redirige aquí; no bloquear en middleware (pierde code/state). */
 const OAUTH_CALLBACK_PATHS = ["/api/gmail/callback"];
