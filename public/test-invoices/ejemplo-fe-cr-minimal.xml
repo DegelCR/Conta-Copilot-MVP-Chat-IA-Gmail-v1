@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FacturaElectronica xmlns="https://cdn.comprobanteselectronicos.go.cr/xml-schemas/v4.4/facturaElectronica">
+  <Clave>50624051000010123456789012345678901234567890123456</Clave>
+  <NumeroConsecutivo>00100001010000000001</NumeroConsecutivo>
+  <FechaEmision>2024-05-15T10:30:00-06:00</FechaEmision>
+  <Emisor>
+    <Nombre>Proveedor Ejemplo S.A.</Nombre>
+    <Identificacion>
+      <Tipo>02</Tipo>
+      <Numero>3101123456</Numero>
+    </Identificacion>
+  </Emisor>
+  <ResumenFactura>
+    <CodigoMoneda>CRC</CodigoMoneda>
+    <TotalGravado>100000.00</TotalGravado>
+    <TotalImpuesto>13000.00</TotalImpuesto>
+    <TotalComprobante>113000.00</TotalComprobante>
+  </ResumenFactura>
+</FacturaElectronica>

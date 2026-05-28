@@ -71,6 +71,7 @@ Chat IA (/dashboard/chat) — preguntas sobre facturas confirmadas
 - [x] OpenAI con créditos activos (~$5 depósito de prueba)
 - [x] **Chat IA** `/dashboard/chat` — preguntas sobre facturas confirmadas (sin historial en DB)
 - [x] **Gmail v1** — OAuth, sync adjuntos **verificado en local y producción** (mayo 2026)
+- [x] **Hacienda fase 3A (sin RUT):** parser XML comprobante CR al subir/procesar; metadatos en `raw_ai_json.hacienda`; panel **Datos fiscales** + consulta emisor `api.hacienda.go.cr/fe/ae` en revisión; XML de prueba `public/test-invoices/ejemplo-fe-cr-minimal.xml`
 
 **Usuario de prueba (prod):** `frtest@gmail.com` — no documentar contraseña en el repo.
 
@@ -108,7 +109,8 @@ Chat IA (/dashboard/chat) — preguntas sobre facturas confirmadas
 | 4 | **Piloto 1 cliente** | Tú | ⏳ — `docs/MANUAL-USUARIO.md` + `docs/MANUAL-ADMIN.md` |
 | 5 | Outlook / sync cron (v1.1) | ⏳ Futuro |
 | 6 | Reenvío correo → buzón de la app (inbound email) | ⏳ Futuro — hoy es Gmail OAuth |
-| 7 | Integración Hacienda CR | ❌ Fase 3 — no tocar |
+| 7 | Hacienda 3A (XML + API pública) | Código | ✅ local — push si falta |
+| 8 | Hacienda sandbox (enviar/consultar) | ⏳ | Credenciales contribuyente + .p12 pruebas |
 
 ---
 
@@ -421,7 +423,7 @@ En la **representación gráfica (PDF)** Hacienda exige, entre otros: tipo de do
 | Prioridad | Campo | Motivo |
 |-----------|--------|--------|
 | Alta | Cédula emisor | Identificación fiscal |
-| Alta | Clave (50 dígitos) o consecutivo completo | Trazabilidad única |
+| Alta | Clave (50 dígitos) o consecutivo completo | Trazabilidad única — **parcial:** parser XML guarda clave en `raw_ai_json` |
 | Alta | Tipo comprobante (FE, TE, NC, ND) | Clasificación fiscal |
 | Media | Cédula receptor | Cuando el usuario es el comprador |
 | Media | Tipo de cambio | Si moneda ≠ CRC |
@@ -430,6 +432,8 @@ En la **representación gráfica (PDF)** Hacienda exige, entre otros: tipo de do
 | Baja | Exoneraciones | Casos especiales |
 
 **Roadmap producto:** organización (MVP actual) → export CSV/Excel → integración XML Hacienda (fase 3). No prometer integración Hacienda en v1.
+
+**Investigación fase 3 (sandbox, APIs, plan por semanas):** [`docs/HACIENDA-FASE3.md`](./docs/HACIENDA-FASE3.md)
 
 ---
 
@@ -500,7 +504,7 @@ Diagnóstico prod: `https://conta-copilot-mvp-chat-ia-gmail-v1.vercel.app/api/de
 - Moneda mixta CRC/USD en stats: se suman sin conversión (MVP)
 - Facturas de prueba HTML/PDF: `public/test-invoices/` (ver `LEEME.md`)
 - Facturas en **EUR** u otros países no reflejan formato CR típico
-- Sin parseo de XML v4.4 ni campos fiscales completos (clave 50 dígitos, CABYS, cédulas)
+- Parser XML v4.x **básico** (no valida XSD ni líneas CABYS); sin envío a sandbox Hacienda
 - Sin paginación en tabla de facturas (máx. 200 resultados)
 - Gmail sync: máx. 50 mensajes por ejecución; adjuntos válidos según `constants.ts`; sin historial de chat en DB
 - Gmail: si Google no devuelve `refresh_token`, revocar acceso en cuenta Google y reconectar con `prompt=consent`

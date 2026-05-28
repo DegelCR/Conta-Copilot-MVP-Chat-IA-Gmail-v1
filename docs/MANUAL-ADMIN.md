@@ -235,6 +235,24 @@ Esperá deploy **Ready** antes de decirle al piloto que “ya está arreglado”
 | Términos de uso | https://conta-copilot-mvp-chat-ia-gmail-v1.vercel.app/terminos |
 | Privacidad | https://conta-copilot-mvp-chat-ia-gmail-v1.vercel.app/privacidad |
 | Factura prueba HTML | https://conta-copilot-mvp-chat-ia-gmail-v1.vercel.app/test-invoices/factura-prueba-gmail.html |
+| XML prueba CR (sin OpenAI) | `public/test-invoices/ejemplo-fe-cr-minimal.xml` o subir tras deploy |
+
+---
+
+## 13. Probar Hacienda sin RUT (desarrollo / demo)
+
+No requiere credenciales del contribuyente ni sandbox.
+
+1. Login con cuenta test.
+2. Dashboard → **Subir factura** → `ejemplo-fe-cr-minimal.xml` (en repo o tras deploy en `/test-invoices/`).
+3. **Facturas** → abrir pendiente → ver panel **Datos fiscales** y montos.
+4. **Consultar** con cédula `3101123456` (emisor del XML de ejemplo).
+
+**Producción:** tras `git push`, esperar deploy **Ready** en Vercel.
+
+**Código:** `src/lib/hacienda/parse-cr-xml.ts`, `public-api.ts`, panel en revisión de factura.
+
+**Pendiente (sí requiere RUT):** envío a `recepcion-sandbox`, firma .p12 — ver `docs/HACIENDA-FASE3.md`.
 
 ---
 
@@ -256,4 +274,4 @@ Variable opcional en Vercel: `NEXT_PUBLIC_CONTACT_EMAIL` (correo en páginas leg
 
 ---
 
-*Última actualización: mayo 2026 — commits `da70b09` (privacidad/términos), `5664b40` (avisos fiscales en UI).*
+*Última actualización: mayo 2026 — avisos legales; Hacienda 3A (XML + consulta pública, sin sandbox).*

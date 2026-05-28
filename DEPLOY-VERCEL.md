@@ -212,7 +212,8 @@ npm run dev
 - [ ] `git push` cambios locales (Excel, docs, facturas prueba) si aplica
 - Dominio propio (opcional)
 - Salir de modo *Testing* en Google cuando haya más usuarios
-- Outlook, inbound email, IA en lote, Hacienda fase 3
+- Outlook, inbound email, IA en lote
+- Hacienda sandbox (credenciales contribuyente) — 3A XML + consulta pública ya en código
 
 ---
 

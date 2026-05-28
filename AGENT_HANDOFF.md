@@ -13,7 +13,8 @@
 | Export Excel | ✅ en prod |
 | Legal / avisos fiscales | ✅ `da70b09`, `5664b40` |
 | Piloto comercial | ⏳ siguiente paso humano |
-| Hacienda | ❌ fase 3 |
+| Hacienda 3A (XML + API pública) | ✅ en código (sin RUT) |
+| Hacienda sandbox | ❌ credenciales contribuyente |
 
 **Git:** `master` · último `5664b40`
 
@@ -38,7 +39,8 @@
 ## Al retomar
 
 1. Ofrecer piloto / feedback.
-2. Ofrecer piloto; opcional: revisión legal de términos con abogada.
+2. Ofrecer piloto; probar XML `ejemplo-fe-cr-minimal.xml`.
+3. Sandbox Hacienda cuando haya credenciales de prueba (RUT contribuyente).
 3. Código futuro: límites IA, IA en lote, inbound email (reenvío).
 
 ---

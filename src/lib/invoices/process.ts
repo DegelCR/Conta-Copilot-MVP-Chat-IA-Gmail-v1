@@ -1,6 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { INVOICE_BUCKET } from "@/lib/invoices/constants";
-import { extractInvoiceFromBufferWithMeta } from "@/lib/invoices/extract";
+import { buildRawAiJson, extractInvoiceData } from "@/lib/invoices/extract-pipeline";
 
 type ProcessResult = {
   vendor: string | null;
@@ -33,10 +33,11 @@ export async function processInvoiceExtraction(
   }
 
   const buffer = Buffer.from(await fileBlob.arrayBuffer());
-  const { extracted, mathValid } = await extractInvoiceFromBufferWithMeta(
+  const result = await extractInvoiceData(
     buffer,
     invoice.file_name ?? "factura.pdf",
   );
+  const { extracted, mathValid } = result;
 
   const { error: updateError } = await supabase
     .from("invoices")
@@ -51,7 +52,7 @@ export async function processInvoiceExtraction(
       currency: extracted.currency ?? "CRC",
       category: extracted.category,
       document_type: extracted.document_type ?? "expense",
-      raw_ai_json: { ...extracted, math_valid: mathValid },
+      raw_ai_json: buildRawAiJson(result),
       updated_at: new Date().toISOString(),
     })
     .eq("id", invoiceId)

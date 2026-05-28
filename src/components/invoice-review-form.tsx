@@ -16,13 +16,28 @@ import { INVOICE_CATEGORIES } from "@/lib/invoices/schema";
 import type { InvoiceDetail } from "@/lib/invoices/queries";
 import { totalsAreConsistent } from "@/lib/invoices/schema";
 import { FiscalDisclaimer } from "@/components/fiscal-disclaimer";
+import { HaciendaFiscalPanel } from "@/components/hacienda-fiscal-panel";
 import { ProcessInvoiceButton } from "@/components/process-invoice-button";
+import type { CrXmlMeta } from "@/lib/hacienda/parse-cr-xml";
 
 type InvoiceReviewFormProps = {
   invoice: InvoiceDetail;
 };
 
 const initialState: ReviewInvoiceState = {};
+
+function haciendaMetaFromRaw(raw: Record<string, unknown> | null | undefined): CrXmlMeta | null {
+  const block = raw?.hacienda;
+  if (!block || typeof block !== "object") return null;
+  const h = block as Record<string, unknown>;
+  return {
+    clave: typeof h.clave === "string" ? h.clave : null,
+    numeroConsecutivo: typeof h.numeroConsecutivo === "string" ? h.numeroConsecutivo : null,
+    tipoComprobante: typeof h.tipoComprobante === "string" ? h.tipoComprobante : null,
+    cedulaEmisor: typeof h.cedulaEmisor === "string" ? h.cedulaEmisor : null,
+    nombreEmisor: typeof h.nombreEmisor === "string" ? h.nombreEmisor : null,
+  };
+}
 
 function PreviewToolbar({
   fileName,
@@ -235,6 +250,11 @@ export function InvoiceReviewForm({ invoice }: InvoiceReviewFormProps) {
   const isConfirmed = invoice.status === "confirmed";
   const isEditable = isPending || isConfirmed;
   const documentType = invoice.document_type ?? "expense";
+  const extractionSource =
+    typeof invoice.raw_ai_json?.extraction_source === "string"
+      ? invoice.raw_ai_json.extraction_source
+      : null;
+  const haciendaMeta = haciendaMetaFromRaw(invoice.raw_ai_json);
   const mathValid = totalsAreConsistent({
     vendor: invoice.vendor,
     invoice_number: invoice.invoice_number,
@@ -273,6 +293,10 @@ export function InvoiceReviewForm({ invoice }: InvoiceReviewFormProps) {
             Subtotal + IVA − retención no coincide con el total. Corrige los montos antes de confirmar.
           </p>
         )}
+
+        <div className="mt-4">
+          <HaciendaFiscalPanel hacienda={haciendaMeta} extractionSource={extractionSource} />
+        </div>
 
         <form action={formAction} className="mt-4 space-y-4">
           <input type="hidden" name="invoiceId" value={invoice.id} />

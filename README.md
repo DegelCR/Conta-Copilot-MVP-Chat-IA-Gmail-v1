@@ -101,7 +101,10 @@ conta-copilot/
 │   │   ├── login/
 │   │   └── signup/
 │   ├── components/
-│   └── lib/supabase/        # Cliente browser, server, middleware
+│   └── lib/
+│       ├── hacienda/        # Parser XML CR + API pública Hacienda
+│       ├── invoices/        # Ingesta, extracción, stats
+│       └── supabase/        # Cliente browser, server, middleware
 ├── supabase/schema.sql
 ├── .env.local.example
 ├── AGENT_HANDOFF.md         # Contexto para continuar con otro agente
@@ -143,11 +146,12 @@ conta-copilot/
 - [x] Gmail v1 (`/dashboard/gmail`) — **conectado y verificado**
 - [x] Export Excel + menú móvil
 - [x] Privacidad, términos y avisos «no es asesoría fiscal» en UI
+- [x] **Hacienda 3A (sin RUT):** lectura XML CR + consulta emisor en API pública
 
 ### Siguiente
 - [ ] Piloto comercial acotado (1 negocio, mes actual)
 - [ ] Revisión legal opcional (términos / textos)
-- [ ] Hacienda CR (fase 3)
+- [ ] Hacienda sandbox (credenciales contribuyente, envío XML)
 
 ---
 
@@ -155,11 +159,11 @@ conta-copilot/
 
 Conta Copilot está pensado para **organizar facturas en Costa Rica** (CRC, IVA ~13 %). La app guarda hoy: proveedor, número, fecha, subtotal, IVA, retención (opcional), total, moneda y categoría.
 
-El **estándar fiscal completo** (Factura Electrónica v4.4 de Hacienda: clave de 50 dígitos, consecutivo, cédulas, CABYS, XML) no está integrado en el MVP; va en fases posteriores (export → Hacienda).
+El **envío oficial** a Hacienda (sandbox/producción, firma .p12) no está integrado. Sí hay **lectura de XML** electrónico CR y **consulta de emisor** en la API pública (`/fe/ae`) al revisar una factura.
 
-Para probar el flujo, usa facturas **locales en colones** o XML CR. Una factura europea en EUR sirve para probar la IA, pero no refleja el formato costarricense.
+Para probar sin OpenAI: sube `public/test-invoices/ejemplo-fe-cr-minimal.xml`. Ver [`public/test-invoices/LEEME.md`](./public/test-invoices/LEEME.md).
 
-Detalle completo: [`CONTINUAR.md`](./CONTINUAR.md) → sección *Facturación Costa Rica — MVP vs estándar Hacienda*.
+Detalle: [`CONTINUAR.md`](./CONTINUAR.md) · Roadmap Hacienda: [`docs/HACIENDA-FASE3.md`](./docs/HACIENDA-FASE3.md).
 
 ---
 

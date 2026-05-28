@@ -96,9 +96,19 @@ Puede marcar la factura como **Gasto** o **Ingreso** antes de confirmar.
 ## 4. Subir una factura a mano (sin Gmail)
 
 1. Menú → **Dashboard**.
-2. En **Subir factura**, elija PDF o imagen (JPG, PNG).
-3. La app intentará extraer datos con IA al subir.
-4. Vaya a **Facturas** → abra la factura → revise → **Confirmar**.
+2. En **Subir factura**, elija PDF, imagen (JPG, PNG) o **XML** de factura electrónica CR.
+3. **XML:** la app intenta leer el archivo directamente (sin usar IA si reconoce el formato).
+4. **PDF/imagen:** la app intentará extraer datos con IA al subir.
+5. Vaya a **Facturas** → abra la factura → revise → **Confirmar**.
+
+### Datos fiscales (Costa Rica)
+
+En la revisión de cada factura verá un recuadro **Datos fiscales (Costa Rica)**:
+
+- Si el archivo fue un **XML electrónico**, puede mostrar clave, tipo de comprobante y cédula del emisor.
+- **Consultar emisor en Hacienda (API pública):** con la cédula del proveedor, consulta nombre y situación tributaria (informativo; no envía la factura a Hacienda).
+
+**Prueba sin costo de IA:** el administrador puede compartir el archivo de ejemplo `ejemplo-fe-cr-minimal.xml` (ver manual admin o carpeta de pruebas en el repo).
 
 ---
 
@@ -136,6 +146,7 @@ Puede marcar la factura como **Gasto** o **Ingreso** antes de confirmar.
 | Solo facturas del **mes actual** | Lo que la app prioriza al conectar Gmail |
 | Revisar siempre antes de **Confirmar** | La IA puede equivocarse |
 | Usar IA solo donde ahorre tiempo | No hace falta en todas |
+| Si recibe **XML** del proveedor | Subir XML primero; suele llenar datos sin IA |
 | En celular use **☰** para navegar | El menú completo está ahí |
 
 ---
