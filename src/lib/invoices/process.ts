@@ -15,7 +15,7 @@ export async function processInvoiceExtraction(
 ): Promise<ProcessResult> {
   const { data: invoice, error: fetchError } = await supabase
     .from("invoices")
-    .select("id, file_path, file_name, user_id")
+    .select("id, file_path, file_name, user_id, document_type")
     .eq("id", invoiceId)
     .eq("user_id", userId)
     .single();
@@ -51,7 +51,7 @@ export async function processInvoiceExtraction(
       total: extracted.total,
       currency: extracted.currency ?? "CRC",
       category: extracted.category,
-      document_type: extracted.document_type ?? "expense",
+      document_type: extracted.document_type ?? invoice.document_type ?? "expense",
       raw_ai_json: buildRawAiJson(result),
       updated_at: new Date().toISOString(),
     })

@@ -53,6 +53,8 @@ export async function uploadInvoiceAction(
     };
   }
 
+  const documentType = parseDocumentType(formData.get("document_type"));
+
   try {
     const buffer = Buffer.from(await fileEntry.arrayBuffer());
     const result = await ingestInvoiceFile(supabase, {
@@ -61,6 +63,7 @@ export async function uploadInvoiceAction(
       buffer,
       mimeType: fileEntry.type,
       source: "manual",
+      documentType,
     });
 
     revalidatePath("/dashboard");

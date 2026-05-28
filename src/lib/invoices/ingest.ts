@@ -2,6 +2,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import {
   INVOICE_BUCKET,
   MAX_INVOICE_FILE_BYTES,
+  type DocumentType,
   isAllowedInvoiceFileName,
   sanitizeFileName,
 } from "@/lib/invoices/constants";
@@ -19,6 +20,7 @@ export type IngestInvoiceInput = {
   mimeType?: string | null;
   source?: InvoiceSource;
   sourceMeta?: Record<string, unknown> | null;
+  documentType?: DocumentType;
   runExtraction?: boolean;
 };
 
@@ -40,6 +42,7 @@ export async function ingestInvoiceFile(
     mimeType,
     source = "manual",
     sourceMeta = null,
+    documentType = "expense",
     runExtraction = true,
   } = input;
 
@@ -81,7 +84,7 @@ export async function ingestInvoiceFile(
       file_path: storagePath,
       file_name: fileName,
       status: "pending_review",
-      document_type: "expense",
+      document_type: documentType,
       source,
       source_meta: sourceMeta,
     })

@@ -31,6 +31,25 @@ export function InvoiceUpload() {
       </p>
 
       <form action={formAction} className="mt-6 space-y-4">
+        <div>
+          <label htmlFor="document_type" className="block text-sm font-medium text-zinc-700">
+            Tipo
+          </label>
+          <select
+            id="document_type"
+            name="document_type"
+            defaultValue="expense"
+            disabled={pending}
+            className="mt-1 w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 disabled:bg-zinc-50 sm:max-w-xs"
+          >
+            <option value="expense">Gasto</option>
+            <option value="income">Ingreso</option>
+          </select>
+          <p className="mt-1 text-xs text-zinc-500">
+            Puedes cambiarlo luego al revisar antes de confirmar.
+          </p>
+        </div>
+
         <div
           className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-zinc-300 bg-zinc-50 px-6 py-10 transition hover:border-emerald-400 hover:bg-emerald-50/30"
           onClick={() => inputRef.current?.click()}
