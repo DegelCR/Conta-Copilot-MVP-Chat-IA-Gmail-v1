@@ -12,7 +12,7 @@ import {
   formatCurrency,
   type InvoiceStatus,
 } from "@/lib/invoices/constants";
-import { INVOICE_CATEGORIES } from "@/lib/invoices/schema";
+import { CategoryField } from "@/components/category-field";
 import type { InvoiceDetail } from "@/lib/invoices/queries";
 import { totalsAreConsistent } from "@/lib/invoices/schema";
 import { FiscalDisclaimer } from "@/components/fiscal-disclaimer";
@@ -23,6 +23,7 @@ import { isManualEntryInvoice } from "@/lib/invoices/manual";
 
 type InvoiceReviewFormProps = {
   invoice: InvoiceDetail;
+  categories: string[];
 };
 
 const initialState: ReviewInvoiceState = {};
@@ -335,7 +336,7 @@ function PreviewPanel({ invoice }: { invoice: InvoiceDetail }) {
   );
 }
 
-export function InvoiceReviewForm({ invoice }: InvoiceReviewFormProps) {
+export function InvoiceReviewForm({ invoice, categories }: InvoiceReviewFormProps) {
   const [state, formAction, pending] = useActionState(reviewInvoiceAction, initialState);
   const isPending = invoice.status === "pending_review";
   const isConfirmed = invoice.status === "confirmed";
@@ -548,19 +549,13 @@ export function InvoiceReviewForm({ invoice }: InvoiceReviewFormProps) {
               <label htmlFor="category" className="block text-sm font-medium text-zinc-700">
                 Categoría
               </label>
-              <select
+              <CategoryField
                 id="category"
-                name="category"
+                categories={categories}
                 defaultValue={invoice.category ?? "Otros"}
                 disabled={!isEditable}
-                className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-zinc-900 disabled:bg-zinc-50"
-              >
-                {INVOICE_CATEGORIES.map((cat) => (
-                  <option key={cat} value={cat}>
-                    {cat}
-                  </option>
-                ))}
-              </select>
+                className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-zinc-900 read-only:bg-zinc-50 disabled:bg-zinc-50"
+              />
             </div>
           </div>
 

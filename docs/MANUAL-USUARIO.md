@@ -99,7 +99,7 @@ Puede marcar la factura como **Gasto** o **Ingreso** antes de confirmar.
 
 1. Menú → **Dashboard**.
 2. Baje hasta el recuadro verde **Registrar sin archivo** (debajo de la zona de subir archivo).
-3. Escriba los datos en los campos: proveedor, fecha, montos, categoría, tipo gasto/ingreso.
+3. Escriba los datos en los campos: proveedor, fecha, montos, categoría, tipo gasto/ingreso. En **Categoría** puede elegir una de la lista o escribir una nueva (ej. Agua); la primera vez que la use quedará guardada para usted.
 4. Pulse **Guardar y confirmar** para que sume en el mes, o **Guardar para revisar después** si quiere revisar una vez más en **Facturas**.
 
 No necesita subir foto ni conectar Gmail para este caso.

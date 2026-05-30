@@ -4,6 +4,7 @@ import { InvoiceExportLink } from "@/components/invoice-export-link";
 import { InvoiceFilters } from "@/components/invoice-filters";
 import { InvoicesTable } from "@/components/invoices-table";
 import { parseInvoiceListFilters } from "@/lib/invoices/filter-params";
+import { getInvoiceCategoriesForUser } from "@/lib/invoices/categories-db";
 import { listInvoicesForUser } from "@/lib/invoices/queries";
 
 type PageProps = {
@@ -13,7 +14,10 @@ type PageProps = {
 export default async function InvoicesPage({ searchParams }: PageProps) {
   const params = await searchParams;
   const filters = parseInvoiceListFilters(params);
-  const invoices = await listInvoicesForUser(filters);
+  const [invoices, categories] = await Promise.all([
+    listInvoicesForUser(filters),
+    getInvoiceCategoriesForUser(),
+  ]);
 
   return (
     <div className="min-h-full bg-zinc-50">
@@ -33,7 +37,7 @@ export default async function InvoicesPage({ searchParams }: PageProps) {
           </p>
         </div>
 
-        <InvoiceFilters filters={filters} />
+        <InvoiceFilters filters={filters} categories={categories} />
 
         <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
           <p className="text-sm text-zinc-600">

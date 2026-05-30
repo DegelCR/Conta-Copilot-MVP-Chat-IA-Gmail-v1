@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { INVOICE_CATEGORIES } from "@/lib/invoices/schema";
+import { CategoryField } from "@/components/category-field";
 import {
   DOCUMENT_TYPE_LABELS,
   INVOICE_STATUS_LABELS,
@@ -10,11 +10,12 @@ import type { InvoiceListFilters } from "@/lib/invoices/queries";
 
 type InvoiceFiltersProps = {
   filters: InvoiceListFilters;
+  categories: string[];
 };
 
 const STATUS_OPTIONS: InvoiceStatus[] = ["pending_review", "confirmed", "rejected"];
 
-export function InvoiceFilters({ filters }: InvoiceFiltersProps) {
+export function InvoiceFilters({ filters, categories }: InvoiceFiltersProps) {
   const hasActiveFilters = Boolean(
     filters.q ||
       filters.status ||
@@ -76,18 +77,15 @@ export function InvoiceFilters({ filters }: InvoiceFiltersProps) {
 
         <label className="block">
           <span className="text-sm font-medium text-zinc-700">Categoría</span>
-          <select
+          <CategoryField
+            id="filter_category"
             name="category"
+            categories={categories}
             defaultValue={filters.category ?? ""}
+            showHint={false}
             className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm text-zinc-900 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
-          >
-            <option value="">Todas</option>
-            {INVOICE_CATEGORIES.map((category) => (
-              <option key={category} value={category}>
-                {category}
-              </option>
-            ))}
-          </select>
+          />
+          <p className="mt-1 text-xs text-zinc-500">Deja vacío para ver todas las categorías.</p>
         </label>
 
         <label className="block">

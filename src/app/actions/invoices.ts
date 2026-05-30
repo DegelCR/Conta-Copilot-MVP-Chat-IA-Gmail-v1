@@ -9,6 +9,8 @@ import {
   type DocumentType,
 } from "@/lib/invoices/constants";
 import { ingestInvoiceFile } from "@/lib/invoices/ingest";
+import { normalizeCategoryName } from "@/lib/invoices/categories";
+import { ensureUserCategory } from "@/lib/invoices/categories-db";
 import {
   MANUAL_ENTRY_FILE_NAME,
   MANUAL_ENTRY_SOURCE,
@@ -115,7 +117,7 @@ function parseInvoiceFields(formData: FormData) {
     retentionAmount: parseOptionalNumber(formData.get("retention_amount")),
     total: parseOptionalNumber(formData.get("total")),
     currency: String(formData.get("currency") ?? "CRC").trim() || "CRC",
-    category: String(formData.get("category") ?? "Otros").trim() || "Otros",
+    category: normalizeCategoryName(String(formData.get("category") ?? "Otros")),
     documentType: parseDocumentType(formData.get("document_type")),
   };
 }
@@ -190,6 +192,8 @@ export async function createManualInvoiceAction(formData: FormData): Promise<voi
     redirectManualError(insertError?.message ?? "Error al guardar la factura.");
   }
 
+  await ensureUserCategory(fields.category);
+
   revalidatePath("/dashboard");
   revalidatePath("/dashboard/invoices");
   if (confirmNow) {
@@ -260,6 +264,7 @@ export async function reviewInvoiceAction(
 
     if (error) return { error: error.message };
 
+    await ensureUserCategory(fields.category);
     revalidateInvoicePaths(invoiceId);
     return { message: "Cambios guardados correctamente." };
   }
@@ -310,6 +315,7 @@ export async function reviewInvoiceAction(
     return { error: updateError.message };
   }
 
+  await ensureUserCategory(fields.category);
   revalidateInvoicePaths(invoiceId);
   redirect("/dashboard");
 }

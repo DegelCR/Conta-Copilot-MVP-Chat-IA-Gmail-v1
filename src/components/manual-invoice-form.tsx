@@ -1,8 +1,12 @@
 import { createManualInvoiceAction } from "@/app/actions/invoices";
+import { CategoryField } from "@/components/category-field";
 import { FiscalDisclaimer } from "@/components/fiscal-disclaimer";
-import { INVOICE_CATEGORIES } from "@/lib/invoices/schema";
 
-export function ManualInvoiceForm() {
+type ManualInvoiceFormProps = {
+  categories: string[];
+};
+
+export function ManualInvoiceForm({ categories }: ManualInvoiceFormProps) {
   return (
     <form action={createManualInvoiceAction} className="space-y-4">
       <div>
@@ -138,18 +142,7 @@ export function ManualInvoiceForm() {
           <label htmlFor="manual_category" className="block text-sm font-medium text-zinc-700">
             Categoría
           </label>
-          <select
-            id="manual_category"
-            name="category"
-            defaultValue="Otros"
-            className="mt-1 w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900"
-          >
-            {INVOICE_CATEGORIES.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat}
-              </option>
-            ))}
-          </select>
+          <CategoryField id="manual_category" categories={categories} defaultValue="Otros" />
         </div>
       </div>
 

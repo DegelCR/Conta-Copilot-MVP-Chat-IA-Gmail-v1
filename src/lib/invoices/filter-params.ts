@@ -1,4 +1,3 @@
-import { INVOICE_CATEGORIES } from "@/lib/invoices/schema";
 import type { DocumentType, InvoiceStatus } from "@/lib/invoices/constants";
 import type { InvoiceListFilters } from "@/lib/invoices/queries";
 
@@ -29,10 +28,7 @@ export function parseInvoiceListFilters(
     documentType: VALID_DOCUMENT_TYPES.includes(documentType as DocumentType)
       ? (documentType as DocumentType)
       : undefined,
-    category:
-      category && INVOICE_CATEGORIES.includes(category as (typeof INVOICE_CATEGORIES)[number])
-        ? category
-        : undefined,
+    category: category?.trim() ? category.trim().slice(0, 60) : undefined,
     vendor: pickParam(params, "vendor")?.trim() || undefined,
     from: pickParam(params, "from") || undefined,
     to: pickParam(params, "to") || undefined,

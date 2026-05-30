@@ -3,6 +3,7 @@ import { DashboardHeader } from "@/components/dashboard-header";
 import { InvoiceUpload } from "@/components/invoice-upload";
 import { ManualInvoiceForm } from "@/components/manual-invoice-form";
 import { RecentInvoices } from "@/components/recent-invoices";
+import { getInvoiceCategoriesForUser } from "@/lib/invoices/categories-db";
 import { formatCurrency, type InvoiceRow } from "@/lib/invoices/constants";
 import { computeMonthlyStats } from "@/lib/invoices/stats";
 
@@ -33,6 +34,7 @@ export default async function DashboardPage({ searchParams }: PageProps) {
     .eq("status", "confirmed");
 
   const stats = computeMonthlyStats((confirmedForStats as InvoiceRow[] | null) ?? []);
+  const categories = await getInvoiceCategoriesForUser();
 
   return (
     <div className="min-h-full bg-zinc-50">
@@ -129,7 +131,7 @@ export default async function DashboardPage({ searchParams }: PageProps) {
             )}
 
             <div className="mt-6">
-              <ManualInvoiceForm />
+              <ManualInvoiceForm categories={categories} />
             </div>
           </div>
         </section>

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { DashboardHeader } from "@/components/dashboard-header";
 import { InvoiceReviewForm } from "@/components/invoice-review-form";
+import { getInvoiceCategoriesForUser } from "@/lib/invoices/categories-db";
 import { getInvoiceForUser } from "@/lib/invoices/queries";
 import { isManualEntryInvoice, manualEntryLabel } from "@/lib/invoices/manual";
 
@@ -11,7 +12,10 @@ type PageProps = {
 
 export default async function InvoiceReviewPage({ params }: PageProps) {
   const { id } = await params;
-  const invoice = await getInvoiceForUser(id);
+  const [invoice, categories] = await Promise.all([
+    getInvoiceForUser(id),
+    getInvoiceCategoriesForUser(),
+  ]);
 
   if (!invoice) {
     notFound();
@@ -48,7 +52,7 @@ export default async function InvoiceReviewPage({ params }: PageProps) {
           </p>
         </div>
 
-        <InvoiceReviewForm invoice={invoice} />
+        <InvoiceReviewForm invoice={invoice} categories={categories} />
       </main>
     </div>
   );
