@@ -1,11 +1,17 @@
 import { createClient } from "@/lib/supabase/server";
 import { DashboardHeader } from "@/components/dashboard-header";
 import { InvoiceUpload } from "@/components/invoice-upload";
+import { ManualInvoiceForm } from "@/components/manual-invoice-form";
 import { RecentInvoices } from "@/components/recent-invoices";
 import { formatCurrency, type InvoiceRow } from "@/lib/invoices/constants";
 import { computeMonthlyStats } from "@/lib/invoices/stats";
 
-export default async function DashboardPage() {
+type PageProps = {
+  searchParams: Promise<{ manual_error?: string }>;
+};
+
+export default async function DashboardPage({ searchParams }: PageProps) {
+  const { manual_error: manualError } = await searchParams;
   const supabase = await createClient();
   const {
     data: { user },
@@ -97,8 +103,38 @@ export default async function DashboardPage() {
           </div>
         </div>
 
-        <div className="mt-8 grid gap-8 lg:grid-cols-2">
-          <InvoiceUpload />
+        <section className="mt-8 rounded-xl border border-zinc-200 bg-white p-6">
+          <h2 className="text-lg font-semibold text-zinc-900">Subir factura</h2>
+          <p className="mt-1 text-sm text-zinc-600">
+            Opcional: PDF, foto o XML para que la IA extraiga los datos (máx. 10 MB).
+          </p>
+          <div className="mt-6">
+            <InvoiceUpload embedded />
+          </div>
+
+          <div
+            id="registro-manual"
+            className="mt-10 scroll-mt-24 rounded-xl border-2 border-emerald-200 bg-emerald-50/40 p-6"
+          >
+            <h2 className="text-lg font-semibold text-zinc-900">Registrar sin archivo</h2>
+            <p className="mt-1 text-sm text-zinc-700">
+              Escribe los datos del tiquete o factura en papel. No necesitas subir foto ni archivo
+              arriba.
+            </p>
+
+            {manualError && (
+              <p className="mt-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
+                {manualError}
+              </p>
+            )}
+
+            <div className="mt-6">
+              <ManualInvoiceForm />
+            </div>
+          </div>
+        </section>
+
+        <div className="mt-8">
           <RecentInvoices invoices={(invoices as InvoiceRow[] | null) ?? []} />
         </div>
       </main>

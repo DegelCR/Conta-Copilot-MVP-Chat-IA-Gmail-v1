@@ -57,7 +57,7 @@ Chat IA (/dashboard/chat) — preguntas sobre facturas confirmadas
 - [x] Supabase: `schema.sql`, `storage.sql`, RLS, bucket `invoices`
 - [x] Subida de facturas + lista **Facturas recientes**
 - [x] Extracción OpenAI al subir + botón **Procesar con IA** (facturas sin datos)
-- [x] Revisión: `/dashboard/invoices/[id]` — vista previa PDF/imagen, formulario editable
+- [x] Revisión: `/dashboard/invoices/[id]` — vista previa PDF/imagen, **resumen de montos**, formulario editable
 - [x] **Confirmar** / **Rechazar** factura (redirect al dashboard)
 - [x] Dashboard: **Gastos (mes)** e **IVA estimado** desde facturas **confirmadas**
 - [x] **Tabla de facturas** `/dashboard/invoices` con filtros y búsqueda
@@ -72,13 +72,17 @@ Chat IA (/dashboard/chat) — preguntas sobre facturas confirmadas
 - [x] **Chat IA** `/dashboard/chat` — preguntas sobre facturas confirmadas (sin historial en DB)
 - [x] **Gmail v1** — OAuth, sync adjuntos **verificado en local y producción** (mayo 2026)
 - [x] **Hacienda fase 3A (sin RUT):** parser XML comprobante CR al subir/procesar; metadatos en `raw_ai_json.hacienda`; panel **Datos fiscales** + consulta emisor `api.hacienda.go.cr/fe/ae` en revisión; XML de prueba `public/test-invoices/ejemplo-fe-cr-minimal.xml`
+- [x] **Tipo al subir:** selector **Gasto / Ingreso** en dashboard; Gmail sigue en Gasto por defecto hasta revisar (`e8d7aeb`)
+- [x] **Subida manual:** arrastrar y soltar **un archivo** en la zona del dashboard (además de clic); un archivo por subida
+- [x] **Registro manual sin archivo:** campos de texto debajo de «Subir factura» en dashboard — sin foto ni adjunto; confirmar desde el formulario o revisar después
+- [x] **Revisión:** bloque **Resumen de montos** (total destacado + desglose; total calculado si falta el campo)
 
 **Usuario de prueba (prod):** `frtest@gmail.com` — no documentar contraseña en el repo.
 
 **Producción Vercel:** https://conta-copilot-mvp-chat-ia-gmail-v1.vercel.app  
 **Diagnóstico:** `/api/debug/env` → `anonLooksValid: true`
 
-**GitHub:** https://github.com/DegelCR/Conta-Copilot-MVP-Chat-IA-Gmail-v1 (rama `master`, último `5664b40` — avisos fiscales; antes `da70b09` legal)
+**GitHub:** https://github.com/DegelCR/Conta-Copilot-MVP-Chat-IA-Gmail-v1 (rama `master`, último `e8d7aeb`)
 
 **Deploy:** ✅ Producción operativa — ver [`DEPLOY-VERCEL.md`](./DEPLOY-VERCEL.md)
 
@@ -109,7 +113,8 @@ Chat IA (/dashboard/chat) — preguntas sobre facturas confirmadas
 | 4 | **Piloto 1 cliente** | Tú | ⏳ — `docs/MANUAL-USUARIO.md` + `docs/MANUAL-ADMIN.md` |
 | 5 | Outlook / sync cron (v1.1) | ⏳ Futuro |
 | 6 | Reenvío correo → buzón de la app (inbound email) | ⏳ Futuro — hoy es Gmail OAuth |
-| 7 | Hacienda 3A (XML + API pública) | Código | ✅ local — push si falta |
+| 7 | Hacienda 3A (XML + API pública) | Código | ✅ en prod (`898705a`) |
+| 7b | Selector Gasto/Ingreso al subir | Código | ✅ (`e8d7aeb`) |
 | 8 | Hacienda sandbox (enviar/consultar) | ⏳ | Credenciales contribuyente + .p12 pruebas |
 
 ---
@@ -192,7 +197,7 @@ Resumen post-deploy:
 |------|-------------|
 | `/` | Landing |
 | `/login`, `/signup` | Auth |
-| `/dashboard` | Tarjetas mes + subida + lista recientes |
+| `/dashboard` | Tarjetas mes + subida (clic o arrastrar 1 archivo) + lista recientes |
 | `/dashboard/invoices` | Tabla de facturas con filtros y búsqueda |
 | `/dashboard/invoices/[id]` | Revisar / ver factura |
 | `/dashboard/chat` | Chat IA sobre facturas confirmadas |
@@ -485,7 +490,8 @@ Diagnóstico prod: `https://conta-copilot-mvp-chat-ia-gmail-v1.vercel.app/api/de
 | Failed to fetch en signup | Server Actions en `auth.ts` |
 | Invalid API key Supabase | Anon key JWT completa en `.env.local` |
 | OpenAI 429 quota | Usuario añadió créditos (~$5) en platform.openai.com |
-| Montos no cuadran | Validación con retención; campos editables en revisión |
+| Montos no cuadran | Validación con retención; **resumen de montos** + campos editables en revisión |
+| Drag and drop no subía archivo | Zona solo tenía clic; corregido en `invoice-upload.tsx` (asignar archivo al input) |
 | Dashboard en "—" | `stats.ts` suma confirmadas del mes |
 | Falta nº factura / retención | Campos + `add-invoice-fields.sql` + prompt IA |
 | `GMAIL_TOKEN_ENCRYPTION_KEY` missing | Generar clave → `.env.local` → reiniciar `npm run dev` |
@@ -505,6 +511,7 @@ Diagnóstico prod: `https://conta-copilot-mvp-chat-ia-gmail-v1.vercel.app/api/de
 - Facturas de prueba HTML/PDF: `public/test-invoices/` (ver `LEEME.md`)
 - Facturas en **EUR** u otros países no reflejan formato CR típico
 - Parser XML v4.x **básico** (no valida XSD ni líneas CABYS); sin envío a sandbox Hacienda
+- Subida manual: **un archivo por vez** (sin lote múltiple en una sola acción)
 - Sin paginación en tabla de facturas (máx. 200 resultados)
 - Gmail sync: máx. 50 mensajes por ejecución; adjuntos válidos según `constants.ts`; sin historial de chat en DB
 - Gmail: si Google no devuelve `refresh_token`, revocar acceso en cuenta Google y reconectar con `prompt=consent`

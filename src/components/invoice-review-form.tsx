@@ -19,12 +19,80 @@ import { FiscalDisclaimer } from "@/components/fiscal-disclaimer";
 import { HaciendaFiscalPanel } from "@/components/hacienda-fiscal-panel";
 import { ProcessInvoiceButton } from "@/components/process-invoice-button";
 import type { CrXmlMeta } from "@/lib/hacienda/parse-cr-xml";
+import { isManualEntryInvoice } from "@/lib/invoices/manual";
 
 type InvoiceReviewFormProps = {
   invoice: InvoiceDetail;
 };
 
 const initialState: ReviewInvoiceState = {};
+
+function expectedTotalFromParts(
+  subtotal: number | null,
+  tax_amount: number | null,
+  retention_amount: number | null,
+): number | null {
+  if (subtotal == null) return null;
+  const tax = tax_amount ?? 0;
+  const retention = retention_amount ?? 0;
+  return subtotal + tax - retention;
+}
+
+function InvoiceAmountSummary({
+  subtotal,
+  tax_amount,
+  retention_amount,
+  total,
+  currency,
+}: {
+  subtotal: number | null;
+  tax_amount: number | null;
+  retention_amount: number | null;
+  total: number | null;
+  currency: string;
+}) {
+  const expected = expectedTotalFromParts(subtotal, tax_amount, retention_amount);
+  const hasParts = subtotal != null || tax_amount != null || retention_amount != null;
+
+  if (total == null && !hasParts) {
+    return (
+      <p className="mt-3 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-800">
+        No se detectó el total. Complétalo abajo o usa <strong>Procesar con IA</strong>.
+      </p>
+    );
+  }
+
+  return (
+    <div className="mt-3 rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-3">
+      <p className="text-xs font-medium uppercase tracking-wide text-zinc-500">Resumen de montos</p>
+      <p className="mt-1 text-2xl font-semibold text-zinc-900">
+        {total != null ? formatCurrency(total, currency) : "Total no indicado"}
+      </p>
+      {hasParts && (
+        <p className="mt-2 text-sm text-zinc-600">
+          {subtotal != null && <span>Subtotal {formatCurrency(subtotal, currency)}</span>}
+          {tax_amount != null && tax_amount > 0 && (
+            <span>
+              {subtotal != null ? " · " : ""}
+              IVA {formatCurrency(tax_amount, currency)}
+            </span>
+          )}
+          {retention_amount != null && retention_amount > 0 && (
+            <span>
+              {" · "}
+              Retención {formatCurrency(retention_amount, currency)}
+            </span>
+          )}
+          {total == null && expected != null && (
+            <span className="block mt-1 text-amber-800">
+              Calculado (subtotal + IVA − retención): {formatCurrency(expected, currency)}
+            </span>
+          )}
+        </p>
+      )}
+    </div>
+  );
+}
 
 function haciendaMetaFromRaw(raw: Record<string, unknown> | null | undefined): CrXmlMeta | null {
   const block = raw?.hacienda;
@@ -77,6 +145,20 @@ function PreviewToolbar({
   );
 }
 
+function ManualEntryPreview({ className }: { className?: string }) {
+  return (
+    <div
+      className={`flex min-h-[280px] flex-col items-center justify-center rounded-xl border border-dashed border-zinc-300 bg-zinc-50 p-8 text-center ${className ?? ""}`}
+    >
+      <p className="text-sm font-medium text-zinc-800">Registro manual</p>
+      <p className="mt-2 max-w-sm text-sm text-zinc-600">
+        Factura física ingresada campo por campo (sin correo ni archivo). Revisa los datos a la
+        derecha y confirma cuando estén correctos.
+      </p>
+    </div>
+  );
+}
+
 function PreviewContent({
   invoice,
   className,
@@ -84,6 +166,10 @@ function PreviewContent({
   invoice: InvoiceDetail;
   className?: string;
 }) {
+  if (isManualEntryInvoice(invoice)) {
+    return <ManualEntryPreview className={className} />;
+  }
+
   const url = invoice.signedFileUrl;
 
   if (!url) {
@@ -226,20 +312,25 @@ function PreviewExpandedModal({
 
 function PreviewPanel({ invoice }: { invoice: InvoiceDetail }) {
   const [expanded, setExpanded] = useState(false);
+  const manualEntry = isManualEntryInvoice(invoice);
 
   return (
     <>
-      <PreviewToolbar
-        fileName={invoice.file_name}
-        fileUrl={invoice.signedFileUrl}
-        onExpand={() => setExpanded(true)}
-      />
+      {!manualEntry && (
+        <PreviewToolbar
+          fileName={invoice.file_name}
+          fileUrl={invoice.signedFileUrl}
+          onExpand={() => setExpanded(true)}
+        />
+      )}
       <PreviewContent invoice={invoice} className="h-[min(70vh,640px)]" />
-      <PreviewExpandedModal
-        invoice={invoice}
-        open={expanded}
-        onClose={() => setExpanded(false)}
-      />
+      {!manualEntry && (
+        <PreviewExpandedModal
+          invoice={invoice}
+          open={expanded}
+          onClose={() => setExpanded(false)}
+        />
+      )}
     </>
   );
 }
@@ -255,6 +346,7 @@ export function InvoiceReviewForm({ invoice }: InvoiceReviewFormProps) {
       ? invoice.raw_ai_json.extraction_source
       : null;
   const haciendaMeta = haciendaMetaFromRaw(invoice.raw_ai_json);
+  const manualEntry = isManualEntryInvoice(invoice);
   const mathValid = totalsAreConsistent({
     vendor: invoice.vendor,
     invoice_number: invoice.invoice_number,
@@ -271,7 +363,9 @@ export function InvoiceReviewForm({ invoice }: InvoiceReviewFormProps) {
   return (
     <div className="grid gap-8 xl:grid-cols-[1.15fr_1fr]">
       <div>
-        <h2 className="text-sm font-medium text-zinc-700">Documento original</h2>
+        <h2 className="text-sm font-medium text-zinc-700">
+          {manualEntry ? "Origen del registro" : "Documento original"}
+        </h2>
         <div className="mt-3">
           <PreviewPanel invoice={invoice} />
         </div>
@@ -287,6 +381,14 @@ export function InvoiceReviewForm({ invoice }: InvoiceReviewFormProps) {
             {DOCUMENT_TYPE_LABELS[documentType]}
           </span>
         </div>
+
+        <InvoiceAmountSummary
+          subtotal={invoice.subtotal}
+          tax_amount={invoice.tax_amount}
+          retention_amount={invoice.retention_amount}
+          total={invoice.total}
+          currency={invoice.currency ?? "CRC"}
+        />
 
         {!mathValid && isEditable && (
           <p className="mt-3 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-800">
@@ -536,7 +638,7 @@ export function InvoiceReviewForm({ invoice }: InvoiceReviewFormProps) {
           )}
         </form>
 
-        {isConfirmed && (
+        {isConfirmed && !manualEntry && invoice.file_path && (
           <div className="mt-4 rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-3">
             <p className="text-sm text-zinc-600">
               ¿Quieres volver a extraer datos con IA? Se sobrescribirán los campos actuales.

@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { DashboardHeader } from "@/components/dashboard-header";
 import { InvoiceReviewForm } from "@/components/invoice-review-form";
 import { getInvoiceForUser } from "@/lib/invoices/queries";
+import { isManualEntryInvoice, manualEntryLabel } from "@/lib/invoices/manual";
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -32,11 +33,17 @@ export default async function InvoiceReviewPage({ params }: PageProps) {
             {invoice.status === "pending_review" ? "Revisar factura" : "Detalle de factura"}
           </h1>
           <p className="mt-1 text-sm text-zinc-600">
-            {invoice.file_name ?? "Documento"}
+            {isManualEntryInvoice(invoice)
+              ? manualEntryLabel(invoice)
+              : (invoice.file_name ?? "Documento")}
             {invoice.status === "pending_review"
-              ? " — corrige los datos si la IA se equivocó y confirma."
+              ? isManualEntryInvoice(invoice)
+                ? " — revisa los datos ingresados y confirma."
+                : " — corrige los datos si la IA se equivocó y confirma."
               : invoice.status === "confirmed"
-                ? " — puedes editar los datos o reprocesar con IA."
+                ? isManualEntryInvoice(invoice)
+                  ? " — puedes editar los datos."
+                  : " — puedes editar los datos o reprocesar con IA."
                 : "."}
           </p>
         </div>

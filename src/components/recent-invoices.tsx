@@ -6,6 +6,7 @@ import {
   invoiceHasExtraction,
   type InvoiceRow,
 } from "@/lib/invoices/constants";
+import { manualEntryLabel } from "@/lib/invoices/manual";
 import { ProcessInvoiceButton } from "@/components/process-invoice-button";
 
 type RecentInvoicesProps = {
@@ -37,7 +38,7 @@ export function RecentInvoices({ invoices }: RecentInvoicesProps) {
         <div>
           <h2 className="text-lg font-semibold text-zinc-900">Facturas recientes</h2>
           <p className="mt-1 text-sm text-zinc-600">
-            Datos extraídos con IA. Estado pendiente hasta que revises y confirmes.
+            Subidas con IA o registradas a mano. Estado pendiente hasta que revises y confirmes.
           </p>
         </div>
         <Link
@@ -50,7 +51,7 @@ export function RecentInvoices({ invoices }: RecentInvoicesProps) {
 
       {invoices.length === 0 ? (
         <p className="mt-6 rounded-lg bg-zinc-50 px-4 py-8 text-center text-sm text-zinc-500">
-          Aún no hay facturas. Sube tu primera arriba.
+          Aún no hay facturas. Sube un archivo o regístrala manualmente arriba.
         </p>
       ) : (
         <ul className="mt-6 divide-y divide-zinc-100">
@@ -66,9 +67,9 @@ export function RecentInvoices({ invoices }: RecentInvoicesProps) {
               >
                 <div className="min-w-0 flex-1">
                   <p className="font-medium text-zinc-900">
-                    {invoice.vendor ?? invoice.file_name ?? "Sin nombre"}
+                    {invoice.vendor ?? manualEntryLabel(invoice)}
                   </p>
-                  {invoice.vendor && invoice.file_name && (
+                  {invoice.vendor && invoice.file_name && invoice.file_path && (
                     <p className="truncate text-xs text-zinc-500">{invoice.file_name}</p>
                   )}
                   <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-xs text-zinc-600">
@@ -104,7 +105,7 @@ export function RecentInvoices({ invoices }: RecentInvoicesProps) {
                   >
                     {invoice.status === "pending_review" ? "Revisar" : "Ver detalle"}
                   </Link>
-                  {!extracted && invoice.status === "pending_review" && (
+                  {!extracted && invoice.status === "pending_review" && invoice.file_path && (
                     <ProcessInvoiceButton invoiceId={invoice.id} />
                   )}
                 </div>

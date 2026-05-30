@@ -62,7 +62,7 @@ En computadora el menú aparece arriba sin el botón ☰.
 3. Si tiene muchas facturas, puede sincronizar **varias veces** en días distintos.
 4. Vaya a **Facturas** → verá ítems en **Pendiente de revisión** (origen Gmail).
 
-**Nota:** Al sincronizar **no** se usa IA automáticamente. Solo se importan los archivos.
+**Nota:** Al sincronizar **no** se usa IA automáticamente. Solo se importan los archivos. Las facturas de Gmail entran como **Gasto** por defecto; cámbielo al revisar si es un ingreso.
 
 ---
 
@@ -73,13 +73,13 @@ En computadora el menú aparece arriba sin el botón ☰.
 3. A la izquierda (o arriba en el celular) ve el **documento** (PDF o imagen).
    - **Ampliar vista** → pantalla grande para leer el PDF.
    - **Abrir en pestaña nueva** → si prefiere el visor del navegador.
-4. A la derecha están los **datos** (proveedor, fecha, montos, tipo gasto/ingreso, categoría).
+4. A la derecha verá el **Resumen de montos** (total en grande y desglose) y el formulario (proveedor, fecha, subtotal, IVA, retención, total, tipo gasto/ingreso, categoría).
 
 ### Si quiere usar la IA en esa factura
 
 1. Pulse **Procesar con IA** (si los campos están vacíos o quiere volver a extraer).
 2. Espere unos segundos.
-3. **Revise** que proveedor, montos y fecha estén correctos.
+3. **Revise** el resumen de montos (sobre todo el **total**), proveedor y fecha; corrija en el formulario si hace falta.
 4. Corrija lo que haga falta.
 
 ### Confirmar o rechazar
@@ -93,13 +93,26 @@ Puede marcar la factura como **Gasto** o **Ingreso** antes de confirmar.
 
 ---
 
-## 4. Subir una factura a mano (sin Gmail)
+## 4. Agregar facturas en el Dashboard
+
+### A) Solo tiquete o factura en papel (sin correo ni foto)
 
 1. Menú → **Dashboard**.
-2. En **Subir factura**, elija PDF, imagen (JPG, PNG) o **XML** de factura electrónica CR.
-3. **XML:** la app intenta leer el archivo directamente (sin usar IA si reconoce el formato).
-4. **PDF/imagen:** la app intentará extraer datos con IA al subir.
-5. Vaya a **Facturas** → abra la factura → revise → **Confirmar**.
+2. Baje hasta el recuadro verde **Registrar sin archivo** (debajo de la zona de subir archivo).
+3. Escriba los datos en los campos: proveedor, fecha, montos, categoría, tipo gasto/ingreso.
+4. Pulse **Guardar y confirmar** para que sume en el mes, o **Guardar para revisar después** si quiere revisar una vez más en **Facturas**.
+
+No necesita subir foto ni conectar Gmail para este caso.
+
+### B) Con archivo (PDF, imagen o XML)
+
+1. En **Subir factura** (arriba en el mismo dashboard), elija **Tipo: Gasto o Ingreso**.
+2. Suba **un archivo** por vez: arrástrelo a la zona punteada o haga clic. Formatos: PDF, imagen (JPG, PNG) o **XML** de factura electrónica CR.
+3. **XML:** la app lee el archivo directamente cuando reconoce el formato.
+4. **PDF/imagen:** la IA intenta extraer datos al subir.
+5. Vaya a **Facturas** → abra la factura → revise montos y campos → **Confirmar**.
+
+El tipo elegido al subir se mantiene aunque use **Procesar con IA** después (la IA no lo cambia salvo que usted lo edite en revisión).
 
 ### Datos fiscales (Costa Rica)
 
@@ -147,6 +160,8 @@ En la revisión de cada factura verá un recuadro **Datos fiscales (Costa Rica)*
 | Revisar siempre antes de **Confirmar** | La IA puede equivocarse |
 | Usar IA solo donde ahorre tiempo | No hace falta en todas |
 | Si recibe **XML** del proveedor | Subir XML primero; suele llenar datos sin IA |
+| Marcar **Ingreso** al subir | Si es una venta suya, no espere que la IA lo detecte sola |
+| Subir **un archivo** cada vez | Varios PDF a la vez: repita subida por cada factura |
 | En celular use **☰** para navegar | El menú completo está ahí |
 
 ---
@@ -161,6 +176,9 @@ En la revisión de cada factura verá un recuadro **Datos fiscales (Costa Rica)*
 | PDF muy pequeño | Use **Ampliar vista** en la revisión de factura |
 | No veo menú en el celular | Toque **☰** arriba a la derecha |
 | Montos no cuadran | Corrija subtotal, IVA, retención y total en el formulario |
+| No veo el total | Mire el **Resumen de montos** arriba del formulario; si está vacío, complete el campo **Total** o use **Procesar con IA** |
+| Arrastrar archivo no funciona | Use **clic** en la zona punteada; si sigue fallando, avise al administrador (requiere deploy reciente) |
+| Solté varios archivos a la vez | La app solo toma **uno** por subida; repita para cada factura |
 
 ---
 
@@ -174,4 +192,4 @@ Contacte a quien le dio el acceso (Francisco / administrador del piloto) con:
 
 ---
 
-*Conta Copilot — beta. No es asesoría fiscal ni legal. Sin vínculo con Hacienda. Mayo 2026.*
+*Conta Copilot — beta. No es asesoría fiscal ni legal. Sin vínculo con Hacienda. Mayo 2026 — arrastrar/soltar un archivo al subir; resumen de montos en revisión; Gasto/Ingreso al subir; Hacienda 3A (consulta emisor).*
