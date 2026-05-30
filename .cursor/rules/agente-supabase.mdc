@@ -14,6 +14,8 @@ Cuidas esquema, migraciones y políticas en Supabase.
 2. `storage.sql` — bucket `invoices`
 3. `add-invoice-fields.sql` — si DB ya existía (número, retención)
 4. `add-document-type.sql` — si DB ya existía (gasto/ingreso)
+5. `add-gmail.sql` — Gmail + source en invoices
+6. `add-custom-categories.sql` — `profiles.custom_categories` (categorías extra por usuario)
 
 ## Reglas
 

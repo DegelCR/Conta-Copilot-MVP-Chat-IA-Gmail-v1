@@ -11,6 +11,8 @@ Guía simple para quien usa la aplicación en el piloto.
 - Las deja en una **lista** para revisar.
 - Puede usar **IA** para llenar proveedor y montos (opcional; usted revisa antes de confirmar).
 - Muestra un **resumen del mes** (gastos, ingresos, IVA) en el dashboard.
+- Permite **registrar facturas a mano** (tiquete en papel, sin foto ni correo).
+- Permite **crear sus propias categorías** (ej. Agua) al escribirlas al guardar.
 - Permite descargar **Excel** con sus facturas.
 
 ## ¿Qué NO hace? (importante)
@@ -91,6 +93,12 @@ Antes de confirmar verá un recordatorio: la app **no es asesoría fiscal**.
 
 Puede marcar la factura como **Gasto** o **Ingreso** antes de confirmar.
 
+### Categoría (en revisión o registro manual)
+
+- **Campo de texto:** escriba el nombre (Combustible, Agua, Luz, etc.).
+- **Sugerencias:** el desplegable «O elige una sugerencia» solo copia al texto; no es obligatorio usarlo.
+- Si no ve el cuadro de texto y solo un menú cerrado, recargue la página (`Ctrl + Shift + R`) o avise al administrador (deploy reciente).
+
 ---
 
 ## 4. Agregar facturas en el Dashboard
@@ -99,8 +107,9 @@ Puede marcar la factura como **Gasto** o **Ingreso** antes de confirmar.
 
 1. Menú → **Dashboard**.
 2. Baje hasta el recuadro verde **Registrar sin archivo** (debajo de la zona de subir archivo).
-3. Escriba los datos en los campos: proveedor, fecha, montos, categoría, tipo gasto/ingreso. En **Categoría** puede elegir una de la lista o escribir una nueva (ej. Agua); la primera vez que la use quedará guardada para usted.
-4. Pulse **Guardar y confirmar** para que sume en el mes, o **Guardar para revisar después** si quiere revisar una vez más en **Facturas**.
+3. Escriba los datos en los campos: proveedor, fecha, montos, categoría, tipo gasto/ingreso.
+4. En **Categoría**: use el **cuadro de texto** (arriba) y escriba, por ejemplo, `Agua`. Debajo puede usar **O elige una sugerencia** si prefiere una categoría que ya usó antes. La primera vez que confirme una categoría nueva, quedará guardada para usted.
+5. Pulse **Guardar y confirmar** para que sume en el mes, o **Guardar para revisar después** si quiere revisar una vez más en **Facturas**.
 
 No necesita subir foto ni conectar Gmail para este caso.
 
@@ -162,6 +171,8 @@ En la revisión de cada factura verá un recuadro **Datos fiscales (Costa Rica)*
 | Si recibe **XML** del proveedor | Subir XML primero; suele llenar datos sin IA |
 | Marcar **Ingreso** al subir | Si es una venta suya, no espere que la IA lo detecte sola |
 | Subir **un archivo** cada vez | Varios PDF a la vez: repita subida por cada factura |
+| Tiquete solo en papel | Use **Registrar sin archivo** en el dashboard (recuadro verde) |
+| Categoría que no está en la lista | Escríbala en el cuadro de texto de **Categoría** y confirme la factura |
 | En celular use **☰** para navegar | El menú completo está ahí |
 
 ---
@@ -179,6 +190,8 @@ En la revisión de cada factura verá un recuadro **Datos fiscales (Costa Rica)*
 | No veo el total | Mire el **Resumen de montos** arriba del formulario; si está vacío, complete el campo **Total** o use **Procesar con IA** |
 | Arrastrar archivo no funciona | Use **clic** en la zona punteada; si sigue fallando, avise al administrador (requiere deploy reciente) |
 | Solté varios archivos a la vez | La app solo toma **uno** por subida; repita para cada factura |
+| No puedo escribir en Categoría | Debe verse un **cuadro de texto** arriba; recargue o pida deploy `23ea271` |
+| No veo «Registrar sin archivo» | Baje en el dashboard, debajo de subir archivo (recuadro verde) |
 
 ---
 
@@ -192,4 +205,4 @@ Contacte a quien le dio el acceso (Francisco / administrador del piloto) con:
 
 ---
 
-*Conta Copilot — beta. No es asesoría fiscal ni legal. Sin vínculo con Hacienda. Mayo 2026 — arrastrar/soltar un archivo al subir; resumen de montos en revisión; Gasto/Ingreso al subir; Hacienda 3A (consulta emisor).*
+*Conta Copilot — beta. No es asesoría fiscal ni legal. Sin vínculo con Hacienda. Mayo 2026 — registro manual sin archivo; categorías personalizadas (texto libre); arrastrar/soltar al subir; resumen de montos; Hacienda 3A (consulta emisor).*

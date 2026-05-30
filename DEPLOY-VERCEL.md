@@ -14,7 +14,7 @@ Ruta local: `C:\Users\Fran\Desktop\conta-copilot`
 | **Panel Vercel** | https://vercel.com/degel-cr-s-projects/conta-copilot-mvp-chat-ia-gmail-v1 |
 | **GitHub** | https://github.com/DegelCR/Conta-Copilot-MVP-Chat-IA-Gmail-v1 |
 | **Rama** | `master` |
-| **Commit estable** | `db9df67` (fixes build + login + env cliente) |
+| **Último commit** | `23ea271` (categorías texto libre; registro manual `0826f6e`) |
 | **Supabase ref** | `gufhkxexvqxhnmubmhuq` |
 
 **Verificado en producción (mayo 2026):**
@@ -35,7 +35,8 @@ Ruta local: `C:\Users\Fran\Desktop\conta-copilot`
 - [x] Build **Ready**
 - [x] Login producción
 - [x] Gmail sync + flujo factura en prod (usuario verificó)
-- [ ] Push pendiente: export Excel + docs + `public/test-invoices/` (si aún no en `master`)
+- [x] Registro manual sin archivo + categorías custom en prod (mayo 2026, `0826f6e`–`23ea271`)
+- [ ] Supabase prod: ejecutar `add-custom-categories.sql` si aún no (categorías en perfil)
 
 ---
 
@@ -142,7 +143,7 @@ Si `false` → revisar nombres y valores en pestaña **Production** → Redeploy
 
 1. Login: https://conta-copilot-mvp-chat-ia-gmail-v1.vercel.app/login  
    Usuario de prueba: `frtest@gmail.com` (contraseña en gestor local, no en docs).
-2. Dashboard → subir factura o usar factura de prueba.
+2. Dashboard → **Subir factura** (arrastrar un PDF/XML o clic) → revisar **Resumen de montos** → confirmar; o usar factura de prueba Gmail.
 3. Gmail → conectar → sincronizar (requiere Google configurado).
 4. Chat → pregunta sobre facturas confirmadas.
 
@@ -213,7 +214,7 @@ npm run dev
 - Dominio propio (opcional)
 - Salir de modo *Testing* en Google cuando haya más usuarios
 - Outlook, inbound email, IA en lote
-- Hacienda sandbox (credenciales contribuyente) — 3A XML + consulta pública ya en código
+- Hacienda sandbox (credenciales contribuyente) — 3A XML + consulta pública + selector Gasto/Ingreso al subir en prod
 
 ---
 

@@ -86,7 +86,12 @@ Esto crea tablas `profiles` e `invoices` con **Row Level Security** (cada usuari
 1. Ejecuta **`supabase/storage.sql`** en el SQL Editor (crea bucket `invoices` + políticas).
    - Alternativa manual: **Storage** → **New bucket** → nombre `invoices`, **privado**, límite 10 MB.
 2. Asegúrate de haber ejecutado **`supabase/schema.sql`** (tabla `invoices`).
-3. En el dashboard, usa **Subir factura** (PDF, imagen o XML).
+3. En el dashboard:
+   - **Subir factura** (opcional): elige Gasto/Ingreso y arrastra **un** PDF, imagen o XML.
+   - **Registrar sin archivo**: recuadro verde debajo — tiquete en papel sin foto.
+   - **Categoría**: texto libre; las nuevas se guardan al confirmar (ej. Agua).
+
+Ejecuta también `supabase/add-custom-categories.sql` si usás categorías personalizadas por usuario.
 
 ---
 
@@ -120,9 +125,9 @@ conta-copilot/
 | `/` | Landing |
 | `/login` | Iniciar sesión |
 | `/signup` | Registro |
-| `/dashboard` | Panel + subida + stats del mes |
+| `/dashboard` | Panel + subida archivo + registro manual + stats del mes |
 | `/dashboard/invoices` | Tabla + filtros + export CSV |
-| `/dashboard/invoices/[id]` | Revisar / confirmar factura |
+| `/dashboard/invoices/[id]` | Revisar / confirmar factura (resumen de montos + formulario) |
 | `/dashboard/chat` | Chat IA sobre facturas confirmadas |
 | `/dashboard/gmail` | Conectar / sincronizar Gmail |
 | `/privacidad` | Política de privacidad |
@@ -147,6 +152,10 @@ conta-copilot/
 - [x] Export Excel + menú móvil
 - [x] Privacidad, términos y avisos «no es asesoría fiscal» en UI
 - [x] **Hacienda 3A (sin RUT):** lectura XML CR + consulta emisor en API pública
+- [x] Selector **Gasto / Ingreso** al subir factura (sin depender solo de la IA)
+- [x] Arrastrar y soltar en subida manual; **resumen de montos** en revisión de factura
+- [x] **Registro manual sin archivo** (tiquete en papel, campos de texto)
+- [x] **Categorías personalizadas** (texto libre + sugerencias; `profiles.custom_categories`)
 
 ### Siguiente
 - [ ] Piloto comercial acotado (1 negocio, mes actual)

@@ -20,6 +20,7 @@ Documentación técnica extra: [`DEPLOY-VERCEL.md`](../DEPLOY-VERCEL.md) · [`CO
 | 6 | Enviar link + manual de usuario | WhatsApp / correo |
 | 7 | Sesión 20–30 min de onboarding | Llamada o presencial |
 | 8 | Avisos legales visibles en la app | Franja dashboard, chat, confirmar factura, footer |
+| 9 | SQL categorías custom en Supabase | `add-custom-categories.sql` (ver §3b) |
 
 ---
 
@@ -74,6 +75,23 @@ Después de cambiar → **Deployments → ⋮ → Redeploy**.
 
 3. (Opcional) Si querés crearle cuenta vos: **Authentication → Users → Add user** con su correo.  
    Si no, el piloto usa **Crear cuenta** en la app.
+
+### 3b. Categorías personalizadas (recomendado antes del piloto)
+
+Para que cada usuario pueda **escribir categorías nuevas** (ej. Agua) y que queden guardadas:
+
+1. **SQL Editor** → ejecutá `supabase/add-custom-categories.sql` (añade `profiles.custom_categories`).
+2. Sin este script, las categorías nuevas igual se guardan **en cada factura**, pero pueden no repetirse en sugerencias del perfil.
+
+**Carga masiva de una lista** (cuando te la pasen): por ahora es **una por una** al registrar facturas, o podés actualizar manualmente en Supabase:
+
+```sql
+-- Reemplazá USER_UUID y el array con las categorías del piloto
+update public.profiles
+set custom_categories = array['Agua', 'Luz', 'Internet', 'Alquiler'],
+    updated_at = now()
+where id = 'USER_UUID';
+```
 
 ---
 
@@ -130,7 +148,13 @@ Adaptá el tono (usted/vos). Incluí:
 1. Mostrá el botón **☰**.
 2. Recorrido: Dashboard → Facturas → Gmail → Chat.
 
-### C. Gmail (10 min)
+### C. Facturas en papel (5 min) — sin Gmail
+
+1. **Dashboard** → bajar al recuadro verde **Registrar sin archivo**.
+2. Completar proveedor, fecha, total, **categoría** (cuadro de texto; ej. escribir `Agua`).
+3. **Guardar y confirmar** → debe aparecer en totales del mes.
+
+### D. Gmail (10 min)
 
 1. **Gmail → Conectar Gmail**.
 2. Cuenta donde llegan facturas de **ese negocio** (piloto).
@@ -139,15 +163,23 @@ Adaptá el tono (usted/vos). Incluí:
 5. **Facturas →** abrir una pendiente.
 6. Mostrar **Ampliar vista** en un PDF.
 7. (Opcional) **Procesar con IA** en **1–2** facturas solamente — no en todas si hay muchas.
-8. **Confirmar** una factura.
-9. Volver al **Dashboard** → ver que cambió un total.
+8. Al revisar, mostrar **Tipo Gasto/Ingreso** (Gmail viene en Gasto; se cambia ahí si aplica).
+9. **Confirmar** una factura.
+10. Volver al **Dashboard** → ver que cambió un total.
 
-### D. Excel (3 min)
+### E. Subida con archivo (2 min, opcional)
+
+1. **Dashboard → Subir factura**.
+2. Elegir **Ingreso** o **Gasto** antes del archivo.
+3. **Arrastrar** `ejemplo-fe-cr-minimal.xml` a la zona punteada (o clic para elegirlo) → **Subir factura**.
+4. **Facturas** → pendiente → mostrar **Resumen de montos** (total ₡113 000 en el XML de ejemplo) + panel **Datos fiscales** + consulta cédula.
+
+### F. Excel (3 min)
 
 1. **Facturas → Descargar Excel**.
 2. Abrir el archivo y validar que los datos confirmados aparecen.
 
-### E. Cierre (5 min)
+### G. Cierre (5 min)
 
 Preguntas para anotar:
 
@@ -219,6 +251,8 @@ Esperá deploy **Ready** antes de decirle al piloto que “ya está arreglado”
 | Build falló en Vercel | Env vars faltantes | 8 variables + redeploy |
 | IA no hace nada | Sin crédito OpenAI | Recargar en OpenAI |
 | No ve menú en celular | No conoce ☰ | Enviar manual usuario §1 |
+| Drag and drop no funciona | Código viejo en prod | `git push` → deploy Ready; probar arrastrar un PDF |
+| Piloto: “no sale el total” | IA no llenó el campo | Mostrar **Resumen de montos** en revisión; corregir o **Procesar con IA** |
 
 ---
 
@@ -244,9 +278,9 @@ Esperá deploy **Ready** antes de decirle al piloto que “ya está arreglado”
 No requiere credenciales del contribuyente ni sandbox.
 
 1. Login con cuenta test.
-2. Dashboard → **Subir factura** → `ejemplo-fe-cr-minimal.xml` (en repo o tras deploy en `/test-invoices/`).
-3. **Facturas** → abrir pendiente → ver panel **Datos fiscales** y montos.
-4. **Consultar** con cédula `3101123456` (emisor del XML de ejemplo).
+2. Dashboard → **Subir factura** → tipo **Gasto** o **Ingreso** → arrastrar o elegir `ejemplo-fe-cr-minimal.xml` (no el `.xsd` del ATV).
+3. **Facturas** → abrir pendiente → **Resumen de montos** + panel **Datos fiscales** (clave, cédula).
+4. **Consultar** con cédula `3101123456` (emisor del XML de ejemplo; debe devolver nombre en API pública).
 
 **Producción:** tras `git push`, esperar deploy **Ready** en Vercel.
 
@@ -274,4 +308,4 @@ Variable opcional en Vercel: `NEXT_PUBLIC_CONTACT_EMAIL` (correo en páginas leg
 
 ---
 
-*Última actualización: mayo 2026 — avisos legales; Hacienda 3A (XML + consulta pública, sin sandbox).*
+*Última actualización: mayo 2026 — arrastrar/soltar un archivo; resumen de montos en revisión; Hacienda 3A; Gasto/Ingreso al subir; avisos legales.*

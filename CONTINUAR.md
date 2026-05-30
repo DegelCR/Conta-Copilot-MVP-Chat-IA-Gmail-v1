@@ -35,7 +35,7 @@ Landing → Login/Signup
     ↓
 Dashboard (/dashboard)
     ↓
-Subir factura (manual)  —  o  Gmail (/dashboard/gmail) → sync adjuntos
+Subir archivo (opcional)  —  o  Registrar sin archivo (texto)  —  o  Gmail → sync adjuntos
     ↓
 Storage (bucket invoices) + fila DB status: pending_review
     ↓
@@ -74,7 +74,8 @@ Chat IA (/dashboard/chat) — preguntas sobre facturas confirmadas
 - [x] **Hacienda fase 3A (sin RUT):** parser XML comprobante CR al subir/procesar; metadatos en `raw_ai_json.hacienda`; panel **Datos fiscales** + consulta emisor `api.hacienda.go.cr/fe/ae` en revisión; XML de prueba `public/test-invoices/ejemplo-fe-cr-minimal.xml`
 - [x] **Tipo al subir:** selector **Gasto / Ingreso** en dashboard; Gmail sigue en Gasto por defecto hasta revisar (`e8d7aeb`)
 - [x] **Subida manual:** arrastrar y soltar **un archivo** en la zona del dashboard (además de clic); un archivo por subida
-- [x] **Registro manual sin archivo:** campos de texto debajo de «Subir factura» en dashboard — sin foto ni adjunto; confirmar desde el formulario o revisar después
+- [x] **Registro manual sin archivo:** recuadro verde **Registrar sin archivo** debajo de subida en dashboard — sin foto; **Guardar y confirmar** o revisar después (`0826f6e`)
+- [x] **Categorías personalizadas:** campo de **texto libre** + sugerencias opcionales; al confirmar se guardan en `profiles.custom_categories` (`23d45ec`, `23ea271`)
 - [x] **Revisión:** bloque **Resumen de montos** (total destacado + desglose; total calculado si falta el campo)
 
 **Usuario de prueba (prod):** `frtest@gmail.com` — no documentar contraseña en el repo.
@@ -82,7 +83,7 @@ Chat IA (/dashboard/chat) — preguntas sobre facturas confirmadas
 **Producción Vercel:** https://conta-copilot-mvp-chat-ia-gmail-v1.vercel.app  
 **Diagnóstico:** `/api/debug/env` → `anonLooksValid: true`
 
-**GitHub:** https://github.com/DegelCR/Conta-Copilot-MVP-Chat-IA-Gmail-v1 (rama `master`, último `e8d7aeb`)
+**GitHub:** https://github.com/DegelCR/Conta-Copilot-MVP-Chat-IA-Gmail-v1 (rama `master`, último `23ea271`)
 
 **Deploy:** ✅ Producción operativa — ver [`DEPLOY-VERCEL.md`](./DEPLOY-VERCEL.md)
 
@@ -115,7 +116,9 @@ Chat IA (/dashboard/chat) — preguntas sobre facturas confirmadas
 | 6 | Reenvío correo → buzón de la app (inbound email) | ⏳ Futuro — hoy es Gmail OAuth |
 | 7 | Hacienda 3A (XML + API pública) | Código | ✅ en prod (`898705a`) |
 | 7b | Selector Gasto/Ingreso al subir | Código | ✅ (`e8d7aeb`) |
+| 7c | Registro manual sin archivo + categorías custom | Código | ✅ (`0826f6e`–`23ea271`) |
 | 8 | Hacienda sandbox (enviar/consultar) | ⏳ | Credenciales contribuyente + .p12 pruebas |
+| 9 | Carga masiva lista de categorías (admin) | ⏳ | Hoy: una a una al registrar; script SQL opcional |
 
 ---
 
@@ -197,7 +200,7 @@ Resumen post-deploy:
 |------|-------------|
 | `/` | Landing |
 | `/login`, `/signup` | Auth |
-| `/dashboard` | Tarjetas mes + subida (clic o arrastrar 1 archivo) + lista recientes |
+| `/dashboard` | Tarjetas mes + subida archivo + **Registrar sin archivo** (texto) + recientes |
 | `/dashboard/invoices` | Tabla de facturas con filtros y búsqueda |
 | `/dashboard/invoices/[id]` | Revisar / ver factura |
 | `/dashboard/chat` | Chat IA sobre facturas confirmadas |
@@ -221,7 +224,7 @@ conta-copilot/
 │   │   │   ├── chat.ts              # sendChatMessageAction
 │   │   │   └── gmail.ts             # sync / desconectar
 │   │   ├── dashboard/
-│   │   │   ├── page.tsx             # dashboard + stats mensuales
+│   │   │   ├── page.tsx             # dashboard + subida + registro manual + stats
 │   │   │   ├── chat/page.tsx        # chat IA
 │   │   │   ├── gmail/page.tsx       # conexión Gmail
 │   │   │   └── invoices/
@@ -236,7 +239,9 @@ conta-copilot/
 │   │   └── api/debug/env/
 │   ├── components/
 │   │   ├── auth-form.tsx
-│   │   ├── invoice-upload.tsx
+│   │   ├── invoice-upload.tsx       # subida archivo (dashboard)
+│   │   ├── manual-invoice-form.tsx  # registro sin archivo (server)
+│   │   ├── category-field.tsx       # categoría texto + sugerencias
 │   │   ├── invoice-filters.tsx      # filtros GET en /dashboard/invoices
 │   │   ├── invoice-export-link.tsx  # enlace descarga CSV (filtros actuales)
 │   │   ├── invoices-table.tsx       # tabla de facturas
@@ -258,6 +263,9 @@ conta-copilot/
 │           ├── extract.ts           # OpenAI Vision
 │           ├── process.ts           # download Storage → IA → DB
 │           ├── queries.ts           # getInvoiceForUser, listInvoicesForUser
+│           ├── categories.ts        # merge categorías default + custom
+│           ├── categories-db.ts     # leer/guardar custom_categories en profiles
+│           ├── manual.ts            # detección factura sin archivo
 │           ├── filter-params.ts     # parse filtros URL (tabla + export)
 │           ├── export-csv.ts        # generación CSV
 │           ├── chat-context.ts      # contexto para OpenAI chat
@@ -268,7 +276,8 @@ conta-copilot/
 │   ├── storage.sql                  # bucket invoices
 │   ├── add-invoice-fields.sql       # migración si DB ya existía
 │   ├── add-document-type.sql        # migración gasto/ingreso
-│   └── add-gmail.sql                # Gmail OAuth + dedup imports + source en invoices
+│   ├── add-gmail.sql                # Gmail OAuth + dedup imports + source en invoices
+│   └── add-custom-categories.sql    # profiles.custom_categories text[]
 ├── scripts/check-supabase.mjs
 ├── .env.local.example
 ├── README.md
@@ -448,7 +457,8 @@ En la **representación gráfica (PDF)** Hacienda exige, entre otros: tipo de do
 2. `storage.sql` — bucket `invoices` + políticas  
 3. `add-invoice-fields.sql` — **si la DB ya existía** antes de número/retención  
 4. `add-document-type.sql` — **si la DB ya existía** antes de gasto/ingreso  
-5. `add-gmail.sql` — Gmail OAuth, dedup `gmail_imports`, columnas `source` / `source_meta` en `invoices`
+5. `add-gmail.sql` — Gmail OAuth, dedup `gmail_imports`, columnas `source` / `source_meta` en `invoices`  
+6. `add-custom-categories.sql` — columna `profiles.custom_categories` (categorías extra por usuario)
 
 Auth: Email activo; Site URL `http://localhost:3000`; redirect `/auth/callback`.  
 Gmail: ejecutar `add-gmail.sql` + variables Google en `.env.local` (ver sección Google Cloud arriba).
