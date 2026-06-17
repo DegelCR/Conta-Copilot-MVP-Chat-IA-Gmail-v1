@@ -26,7 +26,17 @@ export async function checkRateLimit(
   userId: string,
   config: RateLimitConfig,
 ): Promise<RateLimitResult> {
-  const admin = createAdminClient();
+  let admin;
+  try {
+    admin = createAdminClient();
+  } catch (error) {
+    console.warn(
+      "rate_limits: SUPABASE_SERVICE_ROLE_KEY no configurada; omitiendo límite.",
+      error instanceof Error ? error.message : error,
+    );
+    return { allowed: true, remaining: config.maxRequests };
+  }
+
   const windowStart = floorWindowStart(Date.now(), config.windowMs);
 
   const { data: existing, error: selectError } = await admin

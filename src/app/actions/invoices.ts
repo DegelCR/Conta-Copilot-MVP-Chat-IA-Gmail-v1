@@ -66,14 +66,14 @@ export async function uploadInvoiceAction(
     };
   }
 
-  const rate = await checkRateLimit(user.id, RATE_LIMITS.upload);
-  if (!rate.allowed) {
-    return { error: rateLimitErrorMessage(rate.retryAfterSeconds) };
-  }
-
   const documentType = parseDocumentType(formData.get("document_type"));
 
   try {
+    const rate = await checkRateLimit(user.id, RATE_LIMITS.upload);
+    if (!rate.allowed) {
+      return { error: rateLimitErrorMessage(rate.retryAfterSeconds) };
+    }
+
     const buffer = Buffer.from(await fileEntry.arrayBuffer());
 
     if (!validateInvoiceFileContent(buffer, fileEntry.name)) {
@@ -107,6 +107,7 @@ export async function uploadInvoiceAction(
     };
   } catch (error) {
     const detail = error instanceof Error ? error.message : "Error al subir la factura.";
+    console.error("uploadInvoiceAction:", error);
     return { error: detail };
   }
 }

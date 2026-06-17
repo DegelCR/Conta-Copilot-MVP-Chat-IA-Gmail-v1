@@ -64,6 +64,13 @@ function bufferStartsWith(buffer: Buffer, prefix: Buffer): boolean {
   return buffer.subarray(0, prefix.length).equals(prefix);
 }
 
+function looksLikePdf(buffer: Buffer): boolean {
+  if (bufferStartsWith(buffer, PDF_MAGIC)) return true;
+  // Algunos PDF (escaneos, exportaciones) traen bytes antes del encabezado.
+  const head = buffer.subarray(0, Math.min(buffer.length, 1024));
+  return head.indexOf(PDF_MAGIC) >= 0;
+}
+
 /** Verifica magic bytes del contenido (defensa contra extensiones/MIME falsos). */
 export function validateInvoiceFileContent(
   buffer: Buffer,
@@ -74,7 +81,7 @@ export function validateInvoiceFileContent(
   const lower = fileName.toLowerCase();
 
   if (lower.endsWith(".pdf")) {
-    return bufferStartsWith(buffer, PDF_MAGIC);
+    return looksLikePdf(buffer);
   }
 
   if (lower.endsWith(".png")) {
