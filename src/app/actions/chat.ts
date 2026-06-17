@@ -4,6 +4,11 @@ import { answerInvoiceChat, type ChatTurn } from "@/lib/invoices/chat";
 import { buildChatContext } from "@/lib/invoices/chat-context";
 import { listConfirmedInvoicesForUser } from "@/lib/invoices/queries";
 import { createClient } from "@/lib/supabase/server";
+import {
+  checkRateLimit,
+  RATE_LIMITS,
+  rateLimitErrorMessage,
+} from "@/lib/security/rate-limit";
 
 export type ChatActionState = {
   error?: string;
@@ -55,6 +60,11 @@ export async function sendChatMessageAction(
 
   if (message.length > MAX_QUESTION_LENGTH) {
     return { error: "La pregunta es demasiado larga (máximo 2000 caracteres)." };
+  }
+
+  const rate = await checkRateLimit(user.id, RATE_LIMITS.chat);
+  if (!rate.allowed) {
+    return { error: rateLimitErrorMessage(rate.retryAfterSeconds) };
   }
 
   const history = parseHistory(formData.get("history"));

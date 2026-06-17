@@ -4,6 +4,11 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { deleteGmailConnection } from "@/lib/gmail/connection";
 import { syncGmailInbox, type GmailSyncResult } from "@/lib/gmail/sync";
+import {
+  checkRateLimit,
+  RATE_LIMITS,
+  rateLimitErrorMessage,
+} from "@/lib/security/rate-limit";
 
 export type GmailActionState = {
   error?: string;
@@ -27,6 +32,11 @@ export async function syncGmailAction(
 
   if (!user) {
     return { error: "Debes iniciar sesión." };
+  }
+
+  const rate = await checkRateLimit(user.id, RATE_LIMITS.gmailSync);
+  if (!rate.allowed) {
+    return { error: rateLimitErrorMessage(rate.retryAfterSeconds) };
   }
 
   try {
@@ -62,7 +72,7 @@ export async function disconnectGmailAction(
   }
 
   try {
-    await deleteGmailConnection(supabase, user.id);
+    await deleteGmailConnection(user.id);
     revalidateGmailPaths();
     return { message: "Gmail desconectado correctamente." };
   } catch (error) {

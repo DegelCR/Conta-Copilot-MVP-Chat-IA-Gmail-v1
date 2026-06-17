@@ -13,7 +13,7 @@ Documentación técnica extra: [`DEPLOY-VERCEL.md`](../DEPLOY-VERCEL.md) · [`CO
 | # | Tarea | Dónde |
 |---|--------|--------|
 | 1 | App desplegada y en **Ready** | Vercel |
-| 2 | 8 variables en **Production** y **Preview** | Vercel → Environment Variables |
+| 2 | **9 variables** en **Production** y **Preview** | Vercel → Environment Variables |
 | 3 | URLs de auth en Supabase | Supabase Dashboard |
 | 4 | Redirect Gmail en Google + **Test users** | Google Cloud Console |
 | 5 | Correo del piloto en Test users | Google Cloud |
@@ -21,6 +21,7 @@ Documentación técnica extra: [`DEPLOY-VERCEL.md`](../DEPLOY-VERCEL.md) · [`CO
 | 7 | Sesión 20–30 min de onboarding | Llamada o presencial |
 | 8 | Avisos legales visibles en la app | Franja dashboard, chat, confirmar factura, footer |
 | 9 | SQL categorías custom en Supabase | `add-custom-categories.sql` (ver §3b) |
+| 10 | SQL seguridad en Supabase | `harden-security.sql` (ver §3c) — **obligatorio** junio 2026 |
 
 ---
 
@@ -29,13 +30,15 @@ Documentación técnica extra: [`DEPLOY-VERCEL.md`](../DEPLOY-VERCEL.md) · [`CO
 1. Abrí: https://conta-copilot-mvp-chat-ia-gmail-v1.vercel.app  
 2. Debe cargar la página principal.
 3. Probá login con tu usuario de prueba.
-4. Diagnóstico (opcional):
+4. Diagnóstico (opcional, local):
 
-   ```text
-   https://conta-copilot-mvp-chat-ia-gmail-v1.vercel.app/api/debug/env
+   ```powershell
+   npm run check:supabase
    ```
 
-   Debe mostrar `supabaseUrlConfigured: true`, `supabaseAnonConfigured: true`, `anonLooksValid: true`.
+   Debe mostrar `health 200`. En producción, verificá login sin errores de Supabase en la consola del navegador.
+
+> La ruta `/api/debug/env` fue eliminada por seguridad (junio 2026).
 
 Si falla → sección **Problemas** al final.
 
@@ -46,12 +49,13 @@ Si falla → sección **Problemas** al final.
 **Proyecto:** https://vercel.com/degel-cr-s-projects/conta-copilot-mvp-chat-ia-gmail-v1  
 **Settings → Environment Variables**
 
-Repetí las **8 variables** en pestaña **Production** y otra vez en **Preview** (mismo valor).
+Repetí las **9 variables** en pestaña **Production** y otra vez en **Preview** (mismo valor).
 
 | Variable | Valor producción |
 |----------|------------------|
 | `NEXT_PUBLIC_SUPABASE_URL` | `https://gufhkxexvqxhnmubmhuq.supabase.co` |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Clave anon completa (`eyJ...`) — **no** `NEXT_PUBLIC_SUPABASE_ANON` |
+| `SUPABASE_SERVICE_ROLE_KEY` | Clave **service_role** (Supabase → Settings → API) — **solo servidor** |
 | `OPENAI_API_KEY` | Tu clave OpenAI |
 | `NEXT_PUBLIC_APP_URL` | `https://conta-copilot-mvp-chat-ia-gmail-v1.vercel.app` |
 | `GOOGLE_CLIENT_ID` | Google Cloud OAuth |
@@ -73,8 +77,25 @@ Después de cambiar → **Deployments → ⋮ → Redeploy**.
 | **Site URL** | `https://conta-copilot-mvp-chat-ia-gmail-v1.vercel.app` |
 | **Redirect URLs** | `https://conta-copilot-mvp-chat-ia-gmail-v1.vercel.app/auth/callback` |
 
-3. (Opcional) Si querés crearle cuenta vos: **Authentication → Users → Add user** con su correo.  
-   Si no, el piloto usa **Crear cuenta** en la app.
+3. (Opcional) Crear cuenta al piloto vos mismo:
+
+   **Opción A — Supabase Dashboard:** Authentication → Users → Add user.
+
+   **Opción B — Script local (recomendado, email ya confirmado):**
+
+   ```powershell
+   cd C:\Users\Fran\Desktop\conta-copilot
+   node scripts/create-pilot-user.mjs --email CORREO --password "Clave123" --name "Nombre Piloto"
+   ```
+
+   Usuarios ya creados para pruebas (contraseña en gestor local, **no** en docs):
+
+   | Nombre | Correo |
+   |--------|--------|
+   | David | `david@ejemplo.com` |
+   | Daniela | `daniela@ejemplo.com` |
+
+   Si no creás cuenta, el piloto usa **Crear cuenta** en la app.
 
 ### 3b. Categorías personalizadas (recomendado antes del piloto)
 
@@ -92,6 +113,16 @@ set custom_categories = array['Agua', 'Luz', 'Internet', 'Alquiler'],
     updated_at = now()
 where id = 'USER_UUID';
 ```
+
+### 3c. Seguridad — tokens Gmail y rate limits (junio 2026)
+
+**Obligatorio** antes del piloto si desplegaste el código con endurecimiento de seguridad:
+
+1. **SQL Editor** → ejecutá `supabase/harden-security.sql`.
+2. Confirmá en Vercel que existe `SUPABASE_SERVICE_ROLE_KEY` (Production + Preview).
+3. **Redeploy** si acabás de añadir la variable.
+
+Sin esto, Gmail puede fallar al conectar/sincronizar. Detalle técnico: [`DEPLOY-VERCEL.md`](../DEPLOY-VERCEL.md) → *Endurecimiento de seguridad*.
 
 ---
 
@@ -118,7 +149,11 @@ Sin esto, Gmail dirá “access blocked” o similar.
 ## 5. Antes de escribirle al piloto
 
 - [ ] App abre y vos podés entrar.
-- [ ] Correo del piloto está en **Google Test users**.
+- [ ] Cambios seguridad jun 2026 pusheados y deploy **Ready** en Vercel.
+- [ ] `harden-security.sql` ejecutado en Supabase prod.
+- [ ] `SUPABASE_SERVICE_ROLE_KEY` en Vercel (Production + Preview).
+- [ ] Correo del piloto está en **Google Test users** (si usará Gmail).
+- [ ] Login probado con usuario piloto.
 - [ ] Tenés el link copiado.
 - [ ] Enviás (opcional) [`MANUAL-USUARIO.md`](./MANUAL-USUARIO.md) o un PDF/resumen.
 - [ ] Acordás: **1 negocio**, **mes actual**, **3 semanas**, feedback honesto.
@@ -248,7 +283,10 @@ Esperá deploy **Ready** antes de decirle al piloto que “ya está arreglado”
 | Login / pantalla en blanco | Variable `ANON_KEY` mal en Vercel | Corregir nombre y redeploy |
 | Gmail bloqueado | Correo no en Test users | Agregar en Google paso 4 |
 | Gmail redirect error | URI distinta Google vs Vercel | Alinear URIs exactas |
-| Build falló en Vercel | Env vars faltantes | 8 variables + redeploy |
+| Build falló en Vercel | Env vars faltantes | **9 variables** + redeploy |
+| Gmail sync / conectar falla | Falta `SUPABASE_SERVICE_ROLE_KEY` | Añadir en Vercel + redeploy |
+| Error service_role en logs | No ejecutaste `harden-security.sql` | SQL Editor → `supabase/harden-security.sql` |
+| "Demasiadas solicitudes" | Rate limit activo (normal) | Esperar unos minutos; no spamear sync/chat |
 | IA no hace nada | Sin crédito OpenAI | Recargar en OpenAI |
 | No ve menú en celular | No conoce ☰ | Enviar manual usuario §1 |
 | Drag and drop no funciona | Código viejo en prod | `git push` → deploy Ready; probar arrastrar un PDF |
@@ -308,4 +346,24 @@ Variable opcional en Vercel: `NEXT_PUBLIC_CONTACT_EMAIL` (correo en páginas leg
 
 ---
 
-*Última actualización: mayo 2026 — arrastrar/soltar un archivo; resumen de montos en revisión; Hacienda 3A; Gasto/Ingreso al subir; avisos legales.*
+## 14. ¿Hay que seguir programando?
+
+**Para arrancar el piloto: no.** El MVP + Gmail + chat + export + legal + seguridad (código) están listos.
+
+**Sí tenés que hacer (admin, ~30 min):**
+
+1. `git push` cambios locales (seguridad jun 2026).
+2. Vercel deploy **Ready**.
+3. `SUPABASE_SERVICE_ROLE_KEY` en Vercel si falta.
+4. SQL: `harden-security.sql` (+ `add-custom-categories.sql` si falta).
+5. Onboarding al piloto (§6).
+
+**Durante el piloto (2–4 semanas):** soporte, monitorear OpenAI, anotar feedback — no nuevas features salvo bug crítico.
+
+**Después del piloto** (solo si el feedback lo justifica): Outlook, sync automático, más volumen, Hacienda sandbox, dominio propio, salir de Google Testing.
+
+Detalle completo: [`CONTINUAR.md`](../CONTINUAR.md) → *Antes del piloto* y *Lo que falta*.
+
+---
+
+*Última actualización: junio 2026 — seguridad, usuarios piloto, checklist pre-beta.*

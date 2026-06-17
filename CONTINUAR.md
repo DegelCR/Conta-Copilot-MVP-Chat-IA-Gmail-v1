@@ -77,17 +77,26 @@ Chat IA (/dashboard/chat) — preguntas sobre facturas confirmadas
 - [x] **Registro manual sin archivo:** recuadro verde **Registrar sin archivo** debajo de subida en dashboard — sin foto; **Guardar y confirmar** o revisar después (`0826f6e`)
 - [x] **Categorías personalizadas:** campo de **texto libre** + sugerencias opcionales; al confirmar se guardan en `profiles.custom_categories` (`23d45ec`, `23ea271`)
 - [x] **Revisión:** bloque **Resumen de montos** (total destacado + desglose; total calculado si falta el campo)
+- [x] **Seguridad (junio 2026):** tokens Gmail solo server-side, rate limits, cabeceras HTTP, validación magic bytes, redirect auth seguro — ver [`DEPLOY-VERCEL.md`](./DEPLOY-VERCEL.md) *(código local; pendiente push + SQL en prod)*
 
-**Usuario de prueba (prod):** `frtest@gmail.com` — no documentar contraseña en el repo.
+**Usuarios de prueba (prod):** contraseñas **no** en el repo — guardar en gestor local.
+
+| Nombre | Correo (login) | Uso |
+|--------|----------------|-----|
+| (admin) | `frtest@gmail.com` | Pruebas prod originales |
+| David | `david@ejemplo.com` | Usuario piloto / demo adicional |
+| Daniela | `daniela@ejemplo.com` | Usuario piloto / demo adicional |
+
+Crear más usuarios: `node scripts/create-pilot-user.mjs --email ... --password "..." --name "..."`
 
 **Producción Vercel:** https://conta-copilot-mvp-chat-ia-gmail-v1.vercel.app  
-**Diagnóstico:** `/api/debug/env` → `anonLooksValid: true`
+**Diagnóstico:** `npm run check:supabase` (local) o login en prod (ver [`DEPLOY-VERCEL.md`](./DEPLOY-VERCEL.md))
 
-**GitHub:** https://github.com/DegelCR/Conta-Copilot-MVP-Chat-IA-Gmail-v1 (rama `master`, último `23ea271`)
+**GitHub:** https://github.com/DegelCR/Conta-Copilot-MVP-Chat-IA-Gmail-v1 (rama `master`, último push `d8bb305`; cambios seguridad jun 2026 **sin push aún**)
 
 **Deploy:** ✅ Producción operativa — ver [`DEPLOY-VERCEL.md`](./DEPLOY-VERCEL.md)
 
-**Pausa (mayo 2026):** desarrollo detenido tras deploy + pruebas prod OK. Siguiente paso humano: **ofrecer piloto** a contacto contable (1 negocio, mes actual). Ver sección **Piloto beta** abajo.
+**Fase actual (junio 2026):** producto listo para **piloto beta**. Desarrollo en pausa salvo bugs o feedback del piloto. Ver sección **Piloto beta** y **Antes del piloto** abajo.
 
 ---
 
@@ -111,7 +120,8 @@ Chat IA (/dashboard/chat) — preguntas sobre facturas confirmadas
 | 2 | **Gmail en producción** | Tú | ✅ Probado (sync + IA en factura de prueba) |
 | 3 | **Export Excel** | Código | ✅ en prod |
 | 3b | **Legal / avisos fiscales** | Código | ✅ UI + términos; revisión abogada opcional |
-| 4 | **Piloto 1 cliente** | Tú | ⏳ — `docs/MANUAL-USUARIO.md` + `docs/MANUAL-ADMIN.md` |
+| 4 | **Piloto 1 cliente** | Tú | ⏳ — manuales listos; ver **Antes del piloto** |
+| 4b | **Endurecimiento seguridad en prod** | Tú | ⏳ — `git push` + `harden-security.sql` + `SUPABASE_SERVICE_ROLE_KEY` |
 | 5 | Outlook / sync cron (v1.1) | ⏳ Futuro |
 | 6 | Reenvío correo → buzón de la app (inbound email) | ⏳ Futuro — hoy es Gmail OAuth |
 | 7 | Hacienda 3A (XML + API pública) | Código | ✅ en prod (`898705a`) |
@@ -141,12 +151,31 @@ Chat IA (/dashboard/chat) — preguntas sobre facturas confirmadas
 
 Resumen post-deploy:
 
-1. Variables: **8** en pestañas **Production** y **Preview** (mismos valores).
+1. Variables: **9** en pestañas **Production** y **Preview** (incluye `SUPABASE_SERVICE_ROLE_KEY`).
 2. Nombre crítico: `NEXT_PUBLIC_SUPABASE_ANON_KEY` (no `..._ANON`).
 3. Supabase Site URL + `/auth/callback` con dominio `*.vercel.app`.
 4. Google: `/api/gmail/callback` en prod.
-5. Facturas prueba: `public/test-invoices/` o URL `/test-invoices/factura-prueba-gmail.html`.
-6. Manuales piloto: [`docs/MANUAL-USUARIO.md`](./docs/MANUAL-USUARIO.md) · administrador: [`docs/MANUAL-ADMIN.md`](./docs/MANUAL-ADMIN.md).
+5. SQL prod: `add-custom-categories.sql` + **`harden-security.sql`** (jun 2026).
+6. Facturas prueba: `public/test-invoices/` o URL `/test-invoices/factura-prueba-gmail.html`.
+7. Manuales piloto: [`docs/MANUAL-USUARIO.md`](./docs/MANUAL-USUARIO.md) · administrador: [`docs/MANUAL-ADMIN.md`](./docs/MANUAL-ADMIN.md).
+
+---
+
+## Antes del piloto (checklist humano)
+
+Hacer **una vez** antes de que el cliente use la app en serio:
+
+- [ ] `git push` cambios locales (seguridad jun 2026 + docs)
+- [ ] Vercel deploy **Ready** tras el push
+- [ ] `SUPABASE_SERVICE_ROLE_KEY` en Vercel (Production + Preview)
+- [ ] Ejecutar `supabase/harden-security.sql` en Supabase prod
+- [ ] Ejecutar `supabase/add-custom-categories.sql` si aún no
+- [ ] Probar login con usuario piloto (p. ej. `david@ejemplo.com`)
+- [ ] Si usará Gmail: correo del piloto en **Google Test users**
+- [ ] Enviar link + [`docs/MANUAL-USUARIO.md`](./docs/MANUAL-USUARIO.md)
+- [ ] Sesión onboarding 20–30 min (ver [`docs/MANUAL-ADMIN.md`](./docs/MANUAL-ADMIN.md))
+
+**No hace falta codear más** para arrancar el piloto si lo anterior está OK.
 
 ---
 
@@ -189,6 +218,10 @@ Resumen post-deploy:
 | Lista facturas | 200 filas |
 | IA en sync Gmail | No automática |
 | IA en subida manual | Sí automática (cuidado en demo) |
+| Rate limit chat | 20 mensajes / 10 min |
+| Rate limit sync Gmail | 5 / 10 min |
+| Rate limit subidas | 30 / hora |
+| Rate limit procesar IA | 20 / hora |
 
 **Futuro si piloto exige volumen:** IA en lote, más mensajes/sync, paginación, tope por plan, inbound email (reenvío a `facturas@...`).
 
@@ -207,7 +240,6 @@ Resumen post-deploy:
 | `/dashboard/gmail` | Conectar / sincronizar Gmail |
 | `/api/gmail/connect` | Inicia OAuth Google (redirect) |
 | `/api/gmail/callback` | Callback OAuth + 1.ª sync |
-| `/api/debug/env` | Comprobar env vars (sin secretos) |
 | `/api/invoices/export` | Excel por defecto; `?format=csv` para CSV |
 
 ---
@@ -236,7 +268,6 @@ conta-copilot/
 │   │   ├── api/gmail/connect/       # OAuth inicio
 │   │   ├── api/gmail/callback/      # OAuth callback
 │   │   ├── login/ signup/ auth/callback/
-│   │   └── api/debug/env/
 │   ├── components/
 │   │   ├── auth-form.tsx
 │   │   ├── invoice-upload.tsx       # subida archivo (dashboard)
@@ -254,8 +285,9 @@ conta-copilot/
 │   │   └── sign-out-button.tsx
 │   └── lib/
 │       ├── crypto/token-encryption.ts
+│       ├── security/                # rate-limit, safe-redirect
 │       ├── gmail/                   # OAuth, connection, sync
-│       ├── supabase/                # client, server, middleware
+│       ├── supabase/                # client, server, admin, middleware
 │       └── invoices/
 │           ├── ingest.ts            # Storage + insert + IA (manual/gmail)
 │           ├── constants.ts         # tipos, MIME, formatCurrency
@@ -277,8 +309,11 @@ conta-copilot/
 │   ├── add-invoice-fields.sql       # migración si DB ya existía
 │   ├── add-document-type.sql        # migración gasto/ingreso
 │   ├── add-gmail.sql                # Gmail OAuth + dedup imports + source en invoices
-│   └── add-custom-categories.sql    # profiles.custom_categories text[]
-├── scripts/check-supabase.mjs
+│   ├── add-custom-categories.sql    # profiles.custom_categories text[]
+│   └── harden-security.sql          # tokens Gmail (columnas) + rate_limits
+├── scripts/
+│   ├── check-supabase.mjs
+│   └── create-pilot-user.mjs        # crear usuario confirmado (service_role)
 ├── .env.local.example
 ├── README.md
 ├── AGENTES.md                       # mapa de agentes + flujo
@@ -297,7 +332,7 @@ Ver plantilla completa en `.env.local.example`. Mínimo:
 ```
 NEXT_PUBLIC_SUPABASE_URL=...
 NEXT_PUBLIC_SUPABASE_ANON_KEY=...
-SUPABASE_SERVICE_ROLE_KEY=...
+SUPABASE_SERVICE_ROLE_KEY=...   # obligatorio en servidor (Gmail tokens + rate limits)
 OPENAI_API_KEY=sk-proj-...
 GOOGLE_CLIENT_ID=....apps.googleusercontent.com
 GOOGLE_CLIENT_SECRET=...
@@ -306,7 +341,8 @@ GMAIL_TOKEN_ENCRYPTION_KEY=   # openssl rand -base64 32
 NEXT_PUBLIC_APP_URL=http://localhost:3000   # opcional
 ```
 
-**Reglas:** nunca pedir keys en el chat. Tras editar `.env.local` → reiniciar `npm run dev`.
+**Reglas:** nunca pedir keys en el chat. Tras editar `.env.local` → reiniciar `npm run dev`.  
+**Seguridad (junio 2026):** ejecutar `supabase/harden-security.sql` en Supabase; ver [`DEPLOY-VERCEL.md`](./DEPLOY-VERCEL.md) → Endurecimiento de seguridad.
 
 ### Google Cloud — Gmail OAuth (prueba local)
 
@@ -475,8 +511,8 @@ npm run build
 npm run check:supabase   # health API Supabase
 ```
 
-Diagnóstico local: `http://localhost:3000/api/debug/env`  
-Diagnóstico prod: `https://conta-copilot-mvp-chat-ia-gmail-v1.vercel.app/api/debug/env`
+Diagnóstico local: `npm run check:supabase`  
+Diagnóstico prod: login en https://conta-copilot-mvp-chat-ia-gmail-v1.vercel.app/login (sin errores Supabase en consola)
 
 ---
 

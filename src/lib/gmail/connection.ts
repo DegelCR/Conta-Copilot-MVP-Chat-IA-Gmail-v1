@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { encryptToken, decryptToken } from "@/lib/crypto/token-encryption";
 import { getGmailBackfillFrom } from "@/lib/gmail/backfill";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 export type GmailConnectionPublic = {
   google_email: string;
@@ -51,11 +52,12 @@ export async function getGmailConnectionPublic(
   return data as GmailConnectionPublic | null;
 }
 
+/** Lee tokens Gmail con service_role (inaccesibles desde el cliente). */
 export async function getGmailConnectionSecrets(
-  supabase: SupabaseClient,
   userId: string,
 ): Promise<GmailConnectionSecrets | null> {
-  const { data, error } = await supabase
+  const admin = createAdminClient();
+  const { data, error } = await admin
     .from("gmail_connections")
     .select(
       "google_email, refresh_token, access_token, token_expires_at, backfill_from, last_history_id",
@@ -88,16 +90,16 @@ export async function getGmailConnectionSecrets(
 }
 
 export async function upsertGmailConnection(params: {
-  supabase: SupabaseClient;
   userId: string;
   googleEmail: string;
   refreshToken: string;
   accessToken?: string | null;
   tokenExpiresAt?: string | null;
 }): Promise<void> {
+  const admin = createAdminClient();
   const backfillFrom = getGmailBackfillFrom().toISOString();
 
-  const { error } = await params.supabase.from("gmail_connections").upsert(
+  const { error } = await admin.from("gmail_connections").upsert(
     {
       user_id: params.userId,
       google_email: params.googleEmail,
@@ -119,13 +121,13 @@ export async function upsertGmailConnection(params: {
 }
 
 export async function updateGmailConnectionTokens(
-  supabase: SupabaseClient,
   userId: string,
   tokens: {
     accessToken?: string | null;
     tokenExpiresAt?: string | null;
   },
 ): Promise<void> {
+  const admin = createAdminClient();
   const payload: Record<string, string | null> = {
     updated_at: new Date().toISOString(),
   };
@@ -140,7 +142,7 @@ export async function updateGmailConnectionTokens(
     payload.token_expires_at = tokens.tokenExpiresAt;
   }
 
-  const { error } = await supabase
+  const { error } = await admin
     .from("gmail_connections")
     .update(payload)
     .eq("user_id", userId);
@@ -151,13 +153,13 @@ export async function updateGmailConnectionTokens(
 }
 
 export async function updateGmailSyncState(
-  supabase: SupabaseClient,
   userId: string,
   state: {
     lastHistoryId?: string | null;
     lastSyncedAt?: string;
   },
 ): Promise<void> {
+  const admin = createAdminClient();
   const payload: Record<string, string | null> = {
     updated_at: new Date().toISOString(),
   };
@@ -170,7 +172,7 @@ export async function updateGmailSyncState(
     payload.last_synced_at = state.lastSyncedAt;
   }
 
-  const { error } = await supabase
+  const { error } = await admin
     .from("gmail_connections")
     .update(payload)
     .eq("user_id", userId);
@@ -180,11 +182,9 @@ export async function updateGmailSyncState(
   }
 }
 
-export async function deleteGmailConnection(
-  supabase: SupabaseClient,
-  userId: string,
-): Promise<void> {
-  const { error } = await supabase
+export async function deleteGmailConnection(userId: string): Promise<void> {
+  const admin = createAdminClient();
+  const { error } = await admin
     .from("gmail_connections")
     .delete()
     .eq("user_id", userId);

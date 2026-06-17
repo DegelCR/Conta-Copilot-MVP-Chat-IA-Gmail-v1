@@ -1,6 +1,6 @@
 # Hacienda CR — investigación fase 3 (borrador)
 
-> **Estado:** investigación previa al piloto. No implementar hasta validar alcance con un contador (p. ej. Don Adriel) y, si aplica, revisión legal.
+> **Estado:** fase **3A en producción** (`898705a`). Sandbox (3C) y emisión (3D) siguen pendientes de credenciales y alcance con contador.
 >
 > **Última revisión:** mayo 2026 · esquema vigente **v4.4**
 
@@ -71,7 +71,7 @@ Para **solo organizar facturas que ya recibís** (PDF/XML del proveedor), el mí
 
 Hoy la app: Gmail/manual → revisión → confirmar → dashboard / Excel. **No** sustituye asesoría ni Hacienda.
 
-### Fase 3A — Lectura XML (sin sandbox de envío) — **parcial en app**
+### Fase 3A — Lectura XML (sin sandbox de envío) — **en prod**
 
 **Objetivo:** si el adjunto es XML v4.4, llenar automáticamente `vendor`, `invoice_number`, clave, cédulas, montos, tipo comprobante.
 
@@ -83,7 +83,9 @@ Hoy la app: Gmail/manual → revisión → confirmar → dashboard / Excel. **No
 | Consulta emisor API pública `/fe/ae` en revisión de factura | ✅ |
 | Subida XML + fallback OpenAI si no reconoce el XML | ✅ |
 
-**Prueba:** subir `ejemplo-fe-cr-minimal.xml` en dashboard (sin credenciales RUT).
+**Prueba:** dashboard → **Subir factura** → tipo Gasto/Ingreso → arrastrar o elegir `ejemplo-fe-cr-minimal.xml` (sin credenciales RUT). En revisión: **Resumen de montos** + panel Datos fiscales. **No** subir el `.xsd` del ATV: es esquema, no comprobante.
+
+**Nota técnica:** la API `/fe/ae` a veces devuelve `situacion` y `regimen` como objetos; el parser en `public-api.ts` los normaliza a texto para mostrar nombre del emisor (p. ej. cédula `3101123456` del XML de ejemplo).
 
 ### Fase 3B — Consultas API pública (sin .p12)
 
@@ -182,4 +184,4 @@ Nunca commitear `.p12` ni contraseñas ATV.
 
 ---
 
-*Documento de planificación. Actualizar cuando empiece implementación o tras feedback del piloto / abogada / contador.*
+*Mayo 2026 — 3A desplegado; selector Gasto/Ingreso al subir (`e8d7aeb`). Actualizar tras sandbox o feedback del piloto.*

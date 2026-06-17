@@ -7,18 +7,19 @@ Ruta: `C:\Users\Fran\Desktop\conta-copilot` · Fuente de verdad: [`CONTINUAR.md`
 
 ---
 
-## Estado (mayo 2026) — pausa tras prod OK
+## Estado (junio 2026) — listo para piloto
 
 | Área | Estado |
 |------|--------|
 | MVP + Chat + Gmail | ✅ |
 | **Producción Vercel** | ✅ login, Gmail, IA probados |
+| **Seguridad (código)** | ✅ tokens Gmail, rate limits, headers — **push + SQL pendiente** |
 | **Export Excel** | ✅ en prod |
 | **Privacidad / Términos** | ✅ `/privacidad`, `/terminos`, footer |
-| **Avisos «no es asesoría fiscal»** | ✅ dashboard, chat, confirmar, landing (`5664b40`) |
-| **Piloto 1 cliente** | ⏳ Buscar contacto (primo u otro); manuales listos |
-| **Hacienda sin RUT** | ✅ Parser XML CR + consulta emisor API pública (local; push si falta) |
-| **Hacienda sandbox** | ❌ Credenciales contribuyente (RUT / hermana) |
+| **Avisos «no es asesoría fiscal»** | ✅ dashboard, chat, confirmar, landing |
+| **Piloto 1 cliente** | ⏳ Checklist *Antes del piloto* en CONTINUAR |
+| **Hacienda sin RUT** | ✅ Parser XML CR + consulta emisor API pública |
+| **Hacienda sandbox** | ❌ Post-piloto (credenciales contribuyente) |
 
 **URL:** https://conta-copilot-mvp-chat-ia-gmail-v1.vercel.app
 
@@ -26,7 +27,9 @@ Ruta: `C:\Users\Fran\Desktop\conta-copilot` · Fuente de verdad: [`CONTINUAR.md`
 
 ## Recordatorios rápidos
 
-- **Vercel env:** 8 variables × **Production** + **Preview** (pestañas separadas). Nombre: `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
+- **Piloto:** checklist en [`CONTINUAR.md`](./CONTINUAR.md) → *Antes del piloto*; admin en [`docs/MANUAL-ADMIN.md`](./docs/MANUAL-ADMIN.md)
+- **Vercel env:** **9 variables** × Production + Preview (incluye `SUPABASE_SERVICE_ROLE_KEY`)
+- **Seguridad jun 2026:** push pendiente + `harden-security.sql` en Supabase prod
 - **Demo sin OpenAI:** Gmail sync + revisar + Excel; no «Procesar con IA» masivo ni Chat.
 - **Alto volumen:** 1 negocio, mes actual, tope ~30–50 IA/mes en piloto.
 - **Correo → app hoy:** Gmail OAuth (no reenvío a `facturas@...` — eso es futuro).
@@ -41,7 +44,8 @@ Ruta: `C:\Users\Fran\Desktop\conta-copilot` · Fuente de verdad: [`CONTINUAR.md`
 | 2 | Revisión legal opcional (abogada) sobre términos |
 | 3 | Límites IA por plan / pulido pro |
 | 4 | Sandbox Hacienda (credenciales contribuyente) |
-| 5 | Inbound email, Outlook |
+| 5 | Subida múltiple en lote (opcional v1.1) |
+| 6 | Inbound email, Outlook |
 
 ---
 
@@ -72,4 +76,4 @@ Estado: MVP + v1 ✅ en prod. Hacienda 3A (XML + consulta pública) en código. 
 
 ---
 
-*Mayo 2026 — prod OK; Hacienda 3A en repo; piloto y sandbox pendientes.*
+*Mayo 2026 — prod OK; UX subida/revisión (drag-drop + resumen montos). Piloto y sandbox pendientes.*

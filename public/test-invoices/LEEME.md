@@ -13,13 +13,18 @@ https://conta-copilot-mvp-chat-ia-gmail-v1.vercel.app/test-invoices/factura-prue
 
 ## Probar subida manual
 
-Dashboard → **Subir factura** → selecciona el PDF.
+1. Dashboard → **Subir factura**.
+2. Elegí **Tipo: Gasto** o **Ingreso**.
+3. Arrastrá **un** archivo a la zona punteada o hacé clic para elegirlo (PDF o `ejemplo-fe-cr-minimal.xml`).
+4. **Subir factura** → en revisión, ver **Resumen de montos** arriba del formulario.
 
 ## Probar XML electrónico CR (sin OpenAI)
 
 1. Subí `ejemplo-fe-cr-minimal.xml` desde el dashboard.
 2. La app intenta leer el XML directamente (sin gastar crédito OpenAI).
-3. En la revisión verás **Datos fiscales (Costa Rica)** y podés **Consultar emisor** en la API pública de Hacienda.
+3. En la revisión: **Resumen de montos** (total ₡113 000 en el ejemplo) + **Datos fiscales (Costa Rica)**; podés **Consultar emisor** (cédula de ejemplo: `3101123456`).
+
+**No uses** `FacturaElectronica_V4.4.xsd.xml` — es el esquema XSD, no una factura electrónica.
 
 ## Datos de la factura de prueba (IA)
 

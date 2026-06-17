@@ -186,7 +186,7 @@ Guía: [`DEPLOY-VERCEL.md`](./DEPLOY-VERCEL.md) · Piloto y límites: [`CONTINUA
 
 **Legal:** avisos visibles en dashboard, chat y al confirmar facturas; textos en `src/lib/legal/disclaimer.ts`. No sustituye asesoría fiscal ni vínculo con Hacienda.
 
-**Estado:** pausa desarrollo mayo 2026; siguiente paso = piloto comercial acotado.
+**Estado (jun 2026):** producto listo para **piloto beta**. Desarrollo en pausa salvo bugs o feedback del piloto. Pendiente operativo: push seguridad + SQL `harden-security.sql` — ver [`CONTINUAR.md`](./CONTINUAR.md) → *Antes del piloto*.
 
 **Manuales:** [`docs/MANUAL-USUARIO.md`](./docs/MANUAL-USUARIO.md) (compartir al piloto) · [`docs/MANUAL-ADMIN.md`](./docs/MANUAL-ADMIN.md) (activación y onboarding).
 
@@ -195,7 +195,8 @@ Guía: [`DEPLOY-VERCEL.md`](./DEPLOY-VERCEL.md) · Piloto y límites: [`CONTINUA
 ## Seguridad
 
 - Nunca commitees `.env.local`.
-- No expongas `SUPABASE_SERVICE_ROLE_KEY` en el cliente.
+- No expongas `SUPABASE_SERVICE_ROLE_KEY` en el cliente (obligatoria en servidor desde jun 2026).
+- Tokens Gmail: cifrados; lectura solo con service role — ver `supabase/harden-security.sql`.
 - Revoca y rota API keys si se filtran en chats o capturas.
 
 ---

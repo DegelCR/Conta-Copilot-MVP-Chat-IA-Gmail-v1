@@ -5,6 +5,7 @@ import {
   type DocumentType,
   isAllowedInvoiceFileName,
   sanitizeFileName,
+  validateInvoiceFileContent,
 } from "@/lib/invoices/constants";
 import {
   formatInvoiceSummary,
@@ -56,6 +57,12 @@ export async function ingestInvoiceFile(
 
   if (!isAllowedInvoiceFileName(fileName, mimeType)) {
     throw new Error("Formato no permitido. Usa PDF, JPG, PNG, WEBP, GIF o XML.");
+  }
+
+  if (!validateInvoiceFileContent(buffer, fileName)) {
+    throw new Error(
+      "El contenido del archivo no coincide con su extensión. Sube un PDF, imagen o XML válido.",
+    );
   }
 
   const safeName = sanitizeFileName(fileName || "factura");

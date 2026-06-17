@@ -94,7 +94,6 @@ function collectAttachments(
 }
 
 async function createGmailClient(
-  supabase: SupabaseClient,
   userId: string,
   secrets: Awaited<ReturnType<typeof getGmailConnectionSecrets>>,
 ) {
@@ -109,7 +108,7 @@ async function createGmailClient(
   });
 
   oauth2.on("tokens", (tokens) => {
-    void updateGmailConnectionTokens(supabase, userId, {
+    void updateGmailConnectionTokens(userId, {
       accessToken: tokens.access_token ?? null,
       tokenExpiresAt: tokens.expiry_date
         ? new Date(tokens.expiry_date).toISOString()
@@ -356,12 +355,12 @@ export async function syncGmailInbox(
   supabase: SupabaseClient,
   userId: string,
 ): Promise<GmailSyncResult> {
-  const secrets = await getGmailConnectionSecrets(supabase, userId);
+  const secrets = await getGmailConnectionSecrets(userId);
   if (!secrets) {
     throw new Error("Conecta Gmail antes de sincronizar.");
   }
 
-  const gmail = await createGmailClient(supabase, userId, secrets);
+  const gmail = await createGmailClient(userId, secrets);
   const profile = await gmail.users.getProfile({ userId: "me" });
   const latestHistoryId = profile.data.historyId ?? null;
 
@@ -421,7 +420,7 @@ export async function syncGmailInbox(
     historyIdToStore = latestHistoryId;
   }
 
-  await updateGmailSyncState(supabase, userId, {
+  await updateGmailSyncState(userId, {
     lastHistoryId: historyIdToStore,
     lastSyncedAt: new Date().toISOString(),
   });

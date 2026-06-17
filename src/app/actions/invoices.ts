@@ -7,6 +7,7 @@ import {
   isAllowedInvoiceFile,
   MAX_INVOICE_FILE_BYTES,
   type DocumentType,
+  validateInvoiceFileContent,
 } from "@/lib/invoices/constants";
 import { ingestInvoiceFile } from "@/lib/invoices/ingest";
 import { normalizeCategoryName } from "@/lib/invoices/categories";
@@ -15,10 +16,16 @@ import {
   MANUAL_ENTRY_FILE_NAME,
   MANUAL_ENTRY_SOURCE,
 } from "@/lib/invoices/manual";
+import { splitTotalWithIva } from "@/lib/invoices/cr-iva";
 import {
   formatInvoiceSummary,
   processInvoiceExtraction,
 } from "@/lib/invoices/process";
+import {
+  checkRateLimit,
+  RATE_LIMITS,
+  rateLimitErrorMessage,
+} from "@/lib/security/rate-limit";
 
 export type UploadInvoiceState = {
   error?: string;
@@ -59,10 +66,23 @@ export async function uploadInvoiceAction(
     };
   }
 
+  const rate = await checkRateLimit(user.id, RATE_LIMITS.upload);
+  if (!rate.allowed) {
+    return { error: rateLimitErrorMessage(rate.retryAfterSeconds) };
+  }
+
   const documentType = parseDocumentType(formData.get("document_type"));
 
   try {
     const buffer = Buffer.from(await fileEntry.arrayBuffer());
+
+    if (!validateInvoiceFileContent(buffer, fileEntry.name)) {
+      return {
+        error:
+          "El contenido del archivo no coincide con su extensión. Sube un PDF, imagen o XML válido.",
+      };
+    }
+
     const result = await ingestInvoiceFile(supabase, {
       userId: user.id,
       fileName: fileEntry.name,
@@ -108,14 +128,27 @@ function parseDocumentType(value: FormDataEntryValue | null): DocumentType {
 }
 
 function parseInvoiceFields(formData: FormData) {
+  const autoIva = String(formData.get("auto_iva") ?? "") === "1";
+  let subtotal = parseOptionalNumber(formData.get("subtotal"));
+  let taxAmount = parseOptionalNumber(formData.get("tax_amount"));
+  const retentionAmount = parseOptionalNumber(formData.get("retention_amount"));
+  let total = parseOptionalNumber(formData.get("total"));
+
+  if (autoIva && total != null && (subtotal == null || taxAmount == null)) {
+    const gross = total + (retentionAmount ?? 0);
+    const split = splitTotalWithIva(gross);
+    subtotal = split.subtotal;
+    taxAmount = split.tax_amount;
+  }
+
   return {
     vendor: String(formData.get("vendor") ?? "").trim() || null,
     invoiceNumber: String(formData.get("invoice_number") ?? "").trim() || null,
     invoiceDate: String(formData.get("invoice_date") ?? "").trim() || null,
-    subtotal: parseOptionalNumber(formData.get("subtotal")),
-    taxAmount: parseOptionalNumber(formData.get("tax_amount")),
-    retentionAmount: parseOptionalNumber(formData.get("retention_amount")),
-    total: parseOptionalNumber(formData.get("total")),
+    subtotal,
+    taxAmount,
+    retentionAmount,
+    total,
     currency: String(formData.get("currency") ?? "CRC").trim() || "CRC",
     category: normalizeCategoryName(String(formData.get("category") ?? "Otros")),
     documentType: parseDocumentType(formData.get("document_type")),
@@ -351,6 +384,11 @@ export async function processInvoiceAction(
 
   if (existing.status === "rejected") {
     return { error: "No se puede reprocesar una factura rechazada." };
+  }
+
+  const rate = await checkRateLimit(user.id, RATE_LIMITS.processAi);
+  if (!rate.allowed) {
+    return { error: rateLimitErrorMessage(rate.retryAfterSeconds) };
   }
 
   const { data: fileRow } = await supabase

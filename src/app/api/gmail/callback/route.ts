@@ -63,7 +63,7 @@ export async function GET(request: Request) {
 
     let refreshToken = tokens.refresh_token ?? undefined;
     if (!refreshToken) {
-      const existing = await getGmailConnectionSecrets(supabase, user.id);
+      const existing = await getGmailConnectionSecrets(user.id);
       refreshToken = existing?.refresh_token ?? undefined;
     }
 
@@ -87,7 +87,6 @@ export async function GET(request: Request) {
     }
 
     await upsertGmailConnection({
-      supabase,
       userId: user.id,
       googleEmail,
       refreshToken,

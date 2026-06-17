@@ -1,14 +1,111 @@
+"use client";
+
+import { useCallback, useState } from "react";
 import { createManualInvoiceAction } from "@/app/actions/invoices";
 import { CategoryField } from "@/components/category-field";
 import { FiscalDisclaimer } from "@/components/fiscal-disclaimer";
+import {
+  formatAmountInput,
+  ivaFromSubtotal,
+  parseAmountInput,
+  splitTotalWithIva,
+  totalFromParts,
+} from "@/lib/invoices/cr-iva";
 
 type ManualInvoiceFormProps = {
   categories: string[];
 };
 
+type AmountSource = "total" | "subtotal" | "manual";
+
 export function ManualInvoiceForm({ categories }: ManualInvoiceFormProps) {
+  const [autoIva, setAutoIva] = useState(true);
+  const [subtotal, setSubtotal] = useState("");
+  const [taxAmount, setTaxAmount] = useState("");
+  const [retention, setRetention] = useState("");
+  const [total, setTotal] = useState("");
+  const [lastSource, setLastSource] = useState<AmountSource>("total");
+
+  const retentionNum = parseAmountInput(retention) ?? 0;
+
+  const applyFromTotal = useCallback(
+    (totalValue: number) => {
+      const { subtotal: st, tax_amount: tax } = splitTotalWithIva(
+        totalValue + retentionNum,
+      );
+      setSubtotal(formatAmountInput(st));
+      setTaxAmount(formatAmountInput(tax));
+      setTotal(formatAmountInput(totalValue));
+    },
+    [retentionNum],
+  );
+
+  const applyFromSubtotal = useCallback(
+    (subtotalValue: number) => {
+      const tax = ivaFromSubtotal(subtotalValue);
+      const tot = totalFromParts(subtotalValue, tax, retentionNum);
+      setSubtotal(formatAmountInput(subtotalValue));
+      setTaxAmount(formatAmountInput(tax));
+      setTotal(formatAmountInput(tot));
+    },
+    [retentionNum],
+  );
+
+  const handleTotalChange = (raw: string) => {
+    setTotal(raw);
+    if (!autoIva) return;
+    const value = parseAmountInput(raw);
+    if (value == null) return;
+    setLastSource("total");
+    applyFromTotal(value);
+  };
+
+  const handleSubtotalChange = (raw: string) => {
+    setSubtotal(raw);
+    if (!autoIva) return;
+    const value = parseAmountInput(raw);
+    if (value == null) return;
+    setLastSource("subtotal");
+    applyFromSubtotal(value);
+  };
+
+  const handleTaxChange = (raw: string) => {
+    setTaxAmount(raw);
+    if (autoIva) setLastSource("manual");
+  };
+
+  const handleRetentionChange = (raw: string) => {
+    setRetention(raw);
+    if (!autoIva) return;
+    const ret = parseAmountInput(raw) ?? 0;
+    const sub = parseAmountInput(subtotal);
+    const tax = parseAmountInput(taxAmount);
+    const tot = parseAmountInput(total);
+    if (lastSource === "subtotal" && sub != null) {
+      setTotal(formatAmountInput(totalFromParts(sub, tax ?? ivaFromSubtotal(sub), ret)));
+    } else if (tot != null) {
+      applyFromTotal(tot);
+    } else if (sub != null) {
+      applyFromSubtotal(sub);
+    }
+  };
+
+  const handleAutoIvaChange = (enabled: boolean) => {
+    setAutoIva(enabled);
+    if (!enabled) return;
+    const tot = parseAmountInput(total);
+    const sub = parseAmountInput(subtotal);
+    if (tot != null) {
+      applyFromTotal(tot);
+    } else if (sub != null) {
+      applyFromSubtotal(sub);
+    }
+  };
+
   return (
     <form action={createManualInvoiceAction} className="space-y-4">
+      <input type="hidden" name="auto_iva" value={autoIva ? "1" : "0"} />
+
       <div>
         <label htmlFor="manual_document_type" className="block text-sm font-medium text-zinc-700">
           Tipo
@@ -67,6 +164,23 @@ export function ManualInvoiceForm({ categories }: ManualInvoiceFormProps) {
 
       <fieldset className="rounded-lg border border-zinc-200 bg-zinc-50/50 p-4">
         <legend className="px-1 text-sm font-medium text-zinc-800">Montos (como en el tiquete)</legend>
+
+        <label className="mt-3 flex cursor-pointer items-start gap-2 text-sm text-zinc-700">
+          <input
+            type="checkbox"
+            checked={autoIva}
+            onChange={(event) => handleAutoIvaChange(event.target.checked)}
+            className="mt-0.5 rounded border-zinc-300"
+          />
+          <span>
+            Calcular IVA 13% automáticamente
+            <span className="mt-0.5 block text-xs text-zinc-500">
+              Escribí el <strong>total pagado</strong> y se completan subtotal e IVA. También podés
+              partir del subtotal.
+            </span>
+          </span>
+        </label>
+
         <div className="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <div>
             <label htmlFor="manual_subtotal" className="block text-sm font-medium text-zinc-700">
@@ -76,8 +190,12 @@ export function ManualInvoiceForm({ categories }: ManualInvoiceFormProps) {
               id="manual_subtotal"
               name="subtotal"
               type="text"
-              placeholder="Opcional"
-              className="mt-1 w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900"
+              inputMode="decimal"
+              value={subtotal}
+              onChange={(event) => handleSubtotalChange(event.target.value)}
+              placeholder={autoIva ? "Se calcula" : "Opcional"}
+              readOnly={autoIva && lastSource === "total"}
+              className="mt-1 w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 read-only:bg-zinc-100"
             />
           </div>
           <div>
@@ -88,8 +206,12 @@ export function ManualInvoiceForm({ categories }: ManualInvoiceFormProps) {
               id="manual_tax_amount"
               name="tax_amount"
               type="text"
-              placeholder="Opcional"
-              className="mt-1 w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900"
+              inputMode="decimal"
+              value={taxAmount}
+              onChange={(event) => handleTaxChange(event.target.value)}
+              placeholder={autoIva ? "Se calcula" : "Opcional"}
+              readOnly={autoIva && lastSource !== "manual"}
+              className="mt-1 w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 read-only:bg-zinc-100"
             />
           </div>
           <div>
@@ -103,6 +225,9 @@ export function ManualInvoiceForm({ categories }: ManualInvoiceFormProps) {
               id="manual_retention_amount"
               name="retention_amount"
               type="text"
+              inputMode="decimal"
+              value={retention}
+              onChange={(event) => handleRetentionChange(event.target.value)}
               placeholder="Opcional"
               className="mt-1 w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900"
             />
@@ -115,7 +240,10 @@ export function ManualInvoiceForm({ categories }: ManualInvoiceFormProps) {
               id="manual_total"
               name="total"
               type="text"
+              inputMode="decimal"
               required
+              value={total}
+              onChange={(event) => handleTotalChange(event.target.value)}
               placeholder="Ej. 12500"
               className="mt-1 w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900"
             />
