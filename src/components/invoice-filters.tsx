@@ -82,6 +82,7 @@ export function InvoiceFilters({ filters, categories }: InvoiceFiltersProps) {
             name="category"
             categories={categories}
             defaultValue={filters.category ?? ""}
+            allowEmpty
             showHint={false}
             className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm text-zinc-900 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
           />
